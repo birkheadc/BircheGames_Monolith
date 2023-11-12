@@ -29,6 +29,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapGet("/", () => "You've reached the Birche Games API.");
+app.MapGet("/", () => "You've reached Birche Games API.");
 
 app.Run();
+
+public partial class Program { }
