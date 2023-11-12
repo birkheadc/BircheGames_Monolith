@@ -79,6 +79,12 @@ public class ResultBuilder<T>
     return this;
   }
 
+  public ResultBuilder<T> WithValue(T value)
+  {
+    _result.Value = value;
+    return this;
+  }
+
   public ResultBuilder<T> WithError(ResultError error)
   {
     _result.Errors.Add(error);
@@ -112,12 +118,6 @@ public class ResultBuilder<T>
       Message = message
     };
     _result.Errors.Add(error);
-    return this;
-  }
-
-  public ResultBuilder<T> WithValue(T value)
-  {
-    _result.Value = value;
     return this;
   }
 }

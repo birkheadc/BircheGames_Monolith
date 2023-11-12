@@ -1,0 +1,11 @@
+using BircheGamesApi.Models;
+
+namespace BircheGamesApi.Repositories;
+
+public interface IUserRepository
+{
+  public Task<Result> CreateUser(UserEntity user);
+  public Task<Result<UserEntity>> GetUserById(string id);
+  public Task<Result> UpdateUser(UserEntity user);
+  public Task<Result> DeleteUser(string id);
+}

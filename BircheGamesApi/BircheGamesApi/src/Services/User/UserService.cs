@@ -1,4 +1,5 @@
-using BircheGamesApi.Config;
+using BircheGamesApi.Models;
+using BircheGamesApi.Repositories;
 using BircheGamesApi.Requests;
 using BircheGamesApi.Validation;
 
@@ -6,20 +7,36 @@ namespace BircheGamesApi.Services;
 
 public class UserService : IUserService
 {
-  private readonly IUserValidator _userValidator;
+  private readonly IUserValidatorFactory _userValidatorFactory;
+  private readonly IUserRepository _userRepository;
 
-  public UserService(IUserValidator userValidator)
+  public UserService(IUserValidatorFactory userValidatorFactory, IUserRepository userRepository)
   {
-    _userValidator = userValidator;
+    _userValidatorFactory = userValidatorFactory;
+    _userRepository = userRepository;
   }
 
-  public Task<Result> RegisterUser(RegisterUserRequest request)
+  public Task<Result> PatchUserDisplayNameAndTag(ChangeDisplayNameAndTagRequest request)
   {
-    // Create a user validator, maybe give it the config instead of this service?
+    throw new NotImplementedException();
+  }
 
-    ResultBuilder resultBuilder = new();
-    return Task.FromResult<Result>(resultBuilder
-      .Fail()
-      .Build());
+  public async Task<Result> RegisterUser(RegisterUserRequest request)
+  {
+    IUserValidator userValidator = _userValidatorFactory.Create();
+    Result validationResult = userValidator
+      .WithEmailAddress(request.EmailAddress)
+      .WithPassword(request.Password)
+      .Validate();
+
+    if (validationResult.WasSuccess == false)
+    {
+      return validationResult;
+    }
+
+    UserEntity user = new(request);
+    Result result = await _userRepository.CreateUser(user);
+    
+    return result;    
   }
 }
