@@ -4,7 +4,7 @@ namespace BircheGamesApiUnitTests.Mocks.Config;
 
 public static class UserValidationConfig_Mocks
 {
-  public static UserValidationConfig Default = new UserValidationConfig()
+  public static UserValidationConfig Default = new()
     {
       DisplayNameMinChars = 1,
       DisplayNameMaxChars = 16,

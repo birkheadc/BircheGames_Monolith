@@ -7,17 +7,17 @@ namespace BircheGamesApi.Models;
 public class UserEntity
 {
   [DynamoDBHashKey]
-  public string Id { get; init; } = "";
+  public string Id { get; set; } = "";
 
   [DynamoDBGlobalSecondaryIndexHashKey]
-  public string EmailAddress { get; init; } = "";
+  public string EmailAddress { get; set; } = "";
 
   [DynamoDBGlobalSecondaryIndexHashKey]
   public string DisplayName { get; set; } = "";
   [DynamoDBGlobalSecondaryIndexRangeKey]
   public string Tag { get; set; } = "";
   [DynamoDBProperty]
-  public string CreationDateTime { get; init; } = "";
+  public string CreationDateTime { get; set; } = "";
   [DynamoDBProperty]
   public string PasswordHash { get; set; } = "";
 

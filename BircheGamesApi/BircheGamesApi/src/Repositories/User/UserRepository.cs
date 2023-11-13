@@ -19,6 +19,11 @@ public class UserRepository : IUserRepository
     throw new NotImplementedException();
   }
 
+  public Task<Result<UserEntity>> GetUserByEmailAddress(string emailAddress)
+  {
+    throw new NotImplementedException();
+  }
+
   public Task<Result<UserEntity>> GetUserById(string id)
   {
     throw new NotImplementedException();

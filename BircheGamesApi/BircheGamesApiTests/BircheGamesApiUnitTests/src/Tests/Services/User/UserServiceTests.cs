@@ -14,10 +14,14 @@ public class UserServiceTests
   [Fact]
   public async Task RegisterUser_Fails_WhenValidatorFails()
   {
+    UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
+      .WithAllSuccessfulResult()
+      .Build();
+
     UserService userService = new
     (
       new UserValidatorFactory_Mocks_ReturnsInvalid(),
-      new UserRepository_Mocks_ReturnsSuccess_GetUserByDisplayNameAndTagFails_TracksMethodCalls()
+      userRepositoryMock
     );
 
     Result result = await userService.RegisterUser(new());
@@ -28,10 +32,14 @@ public class UserServiceTests
   [Fact]
   public async Task RegisterUser_Succeeds_WhenValidatorSucceeds()
   {
+    UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
+      .WithAllSuccessfulResult()
+      .Build();
+      
     UserService userService = new
     (
       new UserValidatorFactory_Mocks_ReturnsValid(),
-      new UserRepository_Mocks_ReturnsSuccess_GetUserByDisplayNameAndTagFails_TracksMethodCalls()  
+      userRepositoryMock  
     );
 
     Result result = await userService.RegisterUser(new());
@@ -42,31 +50,37 @@ public class UserServiceTests
   [Fact]
   public async Task RegisterUser_DoesNotCall_CreateUser_OnRepository_WhenValidatorFails()
   {
-    UserRepository_Mocks_ReturnsSuccess_GetUserByDisplayNameAndTagFails_TracksMethodCalls userRepository = new();
+    UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
+      .WithAllSuccessfulResult()
+      .Build();
+      
     UserService userService = new
     (
       new UserValidatorFactory_Mocks_ReturnsInvalid(),
-      userRepository
+      userRepositoryMock
     );
 
     Result _ = await userService.RegisterUser(new());
 
-    Assert.Empty(userRepository.MethodCalls);
+    Assert.Empty(userRepositoryMock.MethodsCalled);
   }
 
   [Fact]
   public async Task RegisterUser_Calls_CreateUser_WithNewUserEntity_OnRepository_WhenValidatorSucceeds()
   {
-    UserRepository_Mocks_ReturnsSuccess_GetUserByDisplayNameAndTagFails_TracksMethodCalls userRepository = new();
+    UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
+      .WithAllSuccessfulResult()
+      .Build();
+      
     UserService userService = new
     (
       new UserValidatorFactory_Mocks_ReturnsValid(),
-      userRepository
+      userRepositoryMock
     );
 
     Result result = await userService.RegisterUser(new());
     
-    Assert.Equal("CreateUser", userRepository.MethodCalls[0].Item1);
+    Assert.Equal("CreateUser", userRepositoryMock.MethodsCalled[0].Item1);
   }
 
   #endregion RegisterUser
@@ -76,10 +90,14 @@ public class UserServiceTests
   [Fact]
   public async Task PatchUserDisplayNameAndTag_Fails_WhenValidatorFails()
   {
+    UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
+      .WithAllSuccessfulResult()
+      .Build();
+      
     UserService userService = new
     (
       new UserValidatorFactory_Mocks_ReturnsInvalid(),
-      new UserRepository_Mocks_ReturnsSuccess_GetUserByDisplayNameAndTagFails_TracksMethodCalls()
+      userRepositoryMock
     );
 
     Result result = await userService.PatchUserDisplayNameAndTag("", new());
@@ -90,10 +108,15 @@ public class UserServiceTests
   [Fact]
   public async Task PatchUserDisplayNameAndTag_Succeeds_WhenValidatorSucceeds()
   {
+    UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
+      .WithAllSuccessfulResult()
+      .WithGetUserByDisplayNameAndTagResult(new(){ WasSuccess = false })
+      .Build();
+      
     UserService userService = new
     (
       new UserValidatorFactory_Mocks_ReturnsValid(),
-      new UserRepository_Mocks_ReturnsSuccess_GetUserByDisplayNameAndTagFails_TracksMethodCalls()
+      userRepositoryMock
     );
 
     Result result = await userService.PatchUserDisplayNameAndTag("", new());
@@ -104,32 +127,39 @@ public class UserServiceTests
   [Fact]
   public async Task PatchUserDisplayNameAndTag_DoesNotCall_Repository_WhenValidatorFails()
   {
-    UserRepository_Mocks_ReturnsSuccess_GetUserByDisplayNameAndTagFails_TracksMethodCalls userRepository = new();
+    UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
+      .WithAllSuccessfulResult()
+      .Build();
+      
     UserService userService = new
     (
       new UserValidatorFactory_Mocks_ReturnsInvalid(),
-      userRepository
+      userRepositoryMock
     );
 
     Result _ = await userService.PatchUserDisplayNameAndTag("", new());
 
-    Assert.Empty(userRepository.MethodCalls);
+    Assert.Empty(userRepositoryMock.MethodsCalled);
   }
 
   [Fact]
   public async Task PatchUserDisplayNameAndTag_Calls_UpdateUser_OnRepository_WhenValidatorSucceeds()
   {
-    UserRepository_Mocks_ReturnsSuccess_GetUserByDisplayNameAndTagFails_TracksMethodCalls userRepository = new();
+    UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
+      .WithAllSuccessfulResult()
+      .WithGetUserByDisplayNameAndTagResult(new(){ WasSuccess = false })
+      .Build();
+      
     UserService userService = new
     (
       new UserValidatorFactory_Mocks_ReturnsValid(),
-      userRepository
+      userRepositoryMock
     );
 
     Result result = await userService.PatchUserDisplayNameAndTag("", new());
 
-    Assert.NotEmpty(userRepository.MethodCalls);
-    Assert.Contains(userRepository.MethodCalls, m => m.Item1 == "UpdateUser");
+    Assert.NotEmpty(userRepositoryMock.MethodsCalled);
+    Assert.Contains(userRepositoryMock.MethodsCalled, m => m.Item1 == "UpdateUser");
   }
 
   #endregion PatchUserDisplayNameAndTag

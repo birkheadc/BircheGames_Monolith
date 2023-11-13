@@ -17,6 +17,6 @@ public class SecurityTokenService : ISecurityTokenService
 
   public Task<Result<SecurityTokenWrapper>> AuthenticateUser(LoginCredentials credentials)
   {
-    throw new NotImplementedException();
+    
   }
 }
