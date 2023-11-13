@@ -14,6 +14,11 @@ public class UserRepository : IUserRepository
     throw new NotImplementedException();
   }
 
+  public Task<Result<UserEntity>> GetUserByDisplayNameAndTag(string displayName, string tag)
+  {
+    throw new NotImplementedException();
+  }
+
   public Task<Result<UserEntity>> GetUserById(string id)
   {
     throw new NotImplementedException();

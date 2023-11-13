@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using BircheGamesApi;
-using BircheGamesApi.Requests;
 using BircheGamesApi.Services;
 using BircheGamesApiUnitTests.Mocks.Repositories;
 using BircheGamesApiUnitTests.Mocks.Validation;
@@ -18,7 +17,7 @@ public class UserServiceTests
     UserService userService = new
     (
       new UserValidatorFactory_Mocks_ReturnsInvalid(),
-      new UserRepository_Mocks_ReturnsSuccess_TracksMethodCalls()
+      new UserRepository_Mocks_ReturnsSuccess_GetUserByDisplayNameAndTagFails_TracksMethodCalls()
     );
 
     Result result = await userService.RegisterUser(new());
@@ -32,7 +31,7 @@ public class UserServiceTests
     UserService userService = new
     (
       new UserValidatorFactory_Mocks_ReturnsValid(),
-      new UserRepository_Mocks_ReturnsSuccess_TracksMethodCalls()  
+      new UserRepository_Mocks_ReturnsSuccess_GetUserByDisplayNameAndTagFails_TracksMethodCalls()  
     );
 
     Result result = await userService.RegisterUser(new());
@@ -43,14 +42,14 @@ public class UserServiceTests
   [Fact]
   public async Task RegisterUser_DoesNotCall_CreateUser_OnRepository_WhenValidatorFails()
   {
-    UserRepository_Mocks_ReturnsSuccess_TracksMethodCalls userRepository = new();
+    UserRepository_Mocks_ReturnsSuccess_GetUserByDisplayNameAndTagFails_TracksMethodCalls userRepository = new();
     UserService userService = new
     (
       new UserValidatorFactory_Mocks_ReturnsInvalid(),
       userRepository
     );
 
-    Result result = await userService.RegisterUser(new());
+    Result _ = await userService.RegisterUser(new());
 
     Assert.Empty(userRepository.MethodCalls);
   }
@@ -58,7 +57,7 @@ public class UserServiceTests
   [Fact]
   public async Task RegisterUser_Calls_CreateUser_WithNewUserEntity_OnRepository_WhenValidatorSucceeds()
   {
-    UserRepository_Mocks_ReturnsSuccess_TracksMethodCalls userRepository = new();
+    UserRepository_Mocks_ReturnsSuccess_GetUserByDisplayNameAndTagFails_TracksMethodCalls userRepository = new();
     UserService userService = new
     (
       new UserValidatorFactory_Mocks_ReturnsValid(),
@@ -80,12 +79,12 @@ public class UserServiceTests
     UserService userService = new
     (
       new UserValidatorFactory_Mocks_ReturnsInvalid(),
-      new UserRepository_Mocks_ReturnsSuccess_TracksMethodCalls()
+      new UserRepository_Mocks_ReturnsSuccess_GetUserByDisplayNameAndTagFails_TracksMethodCalls()
     );
 
-    // Result result = await userService.PatchUserDisplayNameAndTag(new());
+    Result result = await userService.PatchUserDisplayNameAndTag("", new());
 
-    // Assert.False(result.WasSuccess);
+    Assert.False(result.WasSuccess);
   }
 
   [Fact]
@@ -94,24 +93,43 @@ public class UserServiceTests
     UserService userService = new
     (
       new UserValidatorFactory_Mocks_ReturnsValid(),
-      new UserRepository_Mocks_ReturnsSuccess_TracksMethodCalls()
+      new UserRepository_Mocks_ReturnsSuccess_GetUserByDisplayNameAndTagFails_TracksMethodCalls()
     );
 
-    // Result result = await userService.PatchUserDisplayNameAndTag(new());
+    Result result = await userService.PatchUserDisplayNameAndTag("", new());
 
-    // Assert.True(result.WasSuccess);
+    Assert.True(result.WasSuccess);
   }
 
   [Fact]
   public async Task PatchUserDisplayNameAndTag_DoesNotCall_Repository_WhenValidatorFails()
   {
+    UserRepository_Mocks_ReturnsSuccess_GetUserByDisplayNameAndTagFails_TracksMethodCalls userRepository = new();
+    UserService userService = new
+    (
+      new UserValidatorFactory_Mocks_ReturnsInvalid(),
+      userRepository
+    );
 
+    Result _ = await userService.PatchUserDisplayNameAndTag("", new());
+
+    Assert.Empty(userRepository.MethodCalls);
   }
 
   [Fact]
   public async Task PatchUserDisplayNameAndTag_Calls_UpdateUser_OnRepository_WhenValidatorSucceeds()
   {
+    UserRepository_Mocks_ReturnsSuccess_GetUserByDisplayNameAndTagFails_TracksMethodCalls userRepository = new();
+    UserService userService = new
+    (
+      new UserValidatorFactory_Mocks_ReturnsValid(),
+      userRepository
+    );
 
+    Result result = await userService.PatchUserDisplayNameAndTag("", new());
+
+    Assert.NotEmpty(userRepository.MethodCalls);
+    Assert.Contains(userRepository.MethodCalls, m => m.Item1 == "UpdateUser");
   }
 
   #endregion PatchUserDisplayNameAndTag

@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace BircheGamesApiUnitTests.Mocks.Repositories;
 
-public class UserRepository_Mocks_ReturnsSuccess_TracksMethodCalls : IUserRepository
+public class UserRepository_Mocks_ReturnsSuccess_GetUserByDisplayNameAndTagFails_TracksMethodCalls : IUserRepository
 {
   public readonly List<(string, string[])> MethodCalls = new();
   public Task<Result> CreateUser(UserEntity user)   
@@ -27,6 +27,16 @@ public class UserRepository_Mocks_ReturnsSuccess_TracksMethodCalls : IUserReposi
     ResultBuilder resultBuilder = new();
     return Task.FromResult(resultBuilder
       .Succeed()
+      .Build());
+  }
+
+  public Task<Result<UserEntity>> GetUserByDisplayNameAndTag(string displayName, string tag)
+  {
+    MethodCalls.Add(("GetUserByDisplayNameAndTag", new[]{ displayName, tag }));
+    ResultBuilder<UserEntity> resultBuilder = new();
+    return Task.FromResult(resultBuilder
+      .Fail()
+      .WithGeneralError(404)
       .Build());
   }
 

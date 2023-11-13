@@ -16,9 +16,62 @@ public class UserService : IUserService
     _userRepository = userRepository;
   }
 
-  public Task<Result> PatchUserDisplayNameAndTag(ChangeDisplayNameAndTagRequest request)
+  public async Task<Result> PatchUserDisplayNameAndTag(string id, ChangeDisplayNameAndTagRequest request)
   {
-    throw new NotImplementedException();
+    Result validationResult = ValidateChangeDisplayNameAndTagRequest(request);
+    if (validationResult.WasSuccess == false)
+    {
+      return validationResult;
+    }
+
+    UserEntity? user = (await _userRepository.GetUserById(id)).Value;
+    if (user is null)
+    {
+      return new ResultBuilder()
+        .Fail()
+        .WithGeneralError(404)
+        .Build();
+    }
+
+    if (user.IsDisplayNameChosen)
+    {
+      return new ResultBuilder()
+        .Fail()
+        .WithGeneralError(422, "User has already chosen their display name and tag.")
+        .Build();
+    }
+
+    bool isDisplayNameAndTagUnique = await IsDisplayNameAndTagUnique(request.DisplayName, request.Tag);
+    if (isDisplayNameAndTagUnique == false)
+    {
+      return new ResultBuilder()
+        .Fail()
+        .WithGeneralError(409)
+        .Build();
+    }
+
+    user.DisplayName = request.DisplayName;
+    user.Tag = request.Tag;
+    user.IsDisplayNameChosen = true;
+
+    Result result = await _userRepository.UpdateUser(user);
+    return result;
+  }
+
+  private Result ValidateChangeDisplayNameAndTagRequest(ChangeDisplayNameAndTagRequest request)
+  {
+    IUserValidator userValidator = _userValidatorFactory.Create();
+    Result validationResult = userValidator
+      .WithDisplayName(request.DisplayName)
+      .WithTag(request.Tag)
+      .Validate();
+    return validationResult;
+  }
+
+  private async Task<bool> IsDisplayNameAndTagUnique(string displayName, string tag)
+  {
+    UserEntity? user = (await _userRepository.GetUserByDisplayNameAndTag(displayName, tag)).Value;
+    return user is null;
   }
 
   public async Task<Result> RegisterUser(RegisterUserRequest request)
