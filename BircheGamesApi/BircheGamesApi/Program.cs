@@ -1,3 +1,6 @@
+using Amazon.DynamoDBv2;
+using BircheGamesApi.Config;
+
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var config = builder.Configuration;
@@ -10,6 +13,16 @@ services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
 services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
+services.AddAWSService<IAmazonDynamoDB>();
+
+AmazonSecrets amazonSecrets = AmazonSecretsRetriever.GetSecrets();
+
+UserValidationConfig userValidationConfig = new();
+// Bind userValidationConfig
+
+SecurityTokenConfig securityTokenConfig = new();
+// Bind securityTokenConfig to appsettings
+
 
 var app = builder.Build();
 
