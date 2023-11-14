@@ -1,5 +1,7 @@
 using Amazon.DynamoDBv2.DataModel;
+using Amazon.DynamoDBv2.DocumentModel;
 using BircheGamesApi.Models;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BircheGamesApi.Repositories;
 
@@ -26,9 +28,22 @@ public class UserRepository : IUserRepository
         .Build();
     }
 
-    return resultBuilder
-      .Succeed()
-      .Build();
+    try
+    {
+      await _context.SaveAsync(user);
+      return resultBuilder
+        .Succeed()
+        .Build();
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Error while creating user: {ex.Message}");
+      return resultBuilder
+        .Fail()
+        .WithGeneralError(500, "An unexpected error occurred while connecting to the database.")
+        .Build();
+    }
+    
   }
 
   public Task<Result> DeleteUser(string id)
@@ -36,14 +51,73 @@ public class UserRepository : IUserRepository
     throw new NotImplementedException();
   }
 
-  public Task<Result<UserEntity>> GetUserByDisplayNameAndTag(string displayName, string tag)
+  public async Task<Result<UserEntity>> GetUserByDisplayNameAndTag(string displayName, string tag)
   {
-    throw new NotImplementedException();
+    ResultBuilder<UserEntity> resultBuilder = new();
+
+    DynamoDBOperationConfig config = new()
+    {
+      IndexName = "DisplayName-Tag-index"
+    };
+
+    try
+    {
+      AsyncSearch<UserEntity> asyncSearch = _context.QueryAsync<UserEntity>(displayName, QueryOperator.Equal, new List<object>(){ tag }, config);
+      List<UserEntity> users = await asyncSearch.GetRemainingAsync();
+      if (users.IsNullOrEmpty())
+      {
+        return resultBuilder
+          .Fail()
+          .WithGeneralError(404)
+          .Build();
+      }
+      return resultBuilder
+        .Succeed()
+        .WithValue(users[0])
+        .Build();
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Error while searching for user by display-name / tag: {ex.Message}");
+      return resultBuilder
+        .Fail()
+        .WithGeneralError(500, "An unexpected error occurred while connecting to the database.")
+        .Build();
+    }
   }
 
-  public Task<Result<UserEntity>> GetUserByEmailAddress(string emailAddress)
+  public async Task<Result<UserEntity>> GetUserByEmailAddress(string emailAddress)
   {
-    throw new NotImplementedException();
+    ResultBuilder<UserEntity> resultBuilder = new();
+
+    DynamoDBOperationConfig config = new()
+    {
+      IndexName = "EmailAddress-index"
+    };
+
+    try
+    {
+      List<UserEntity> users = await _context.QueryAsync<UserEntity>(emailAddress, config).GetRemainingAsync();
+      if (users.IsNullOrEmpty())
+      {
+        return resultBuilder
+          .Fail()
+          .WithGeneralError(404)
+          .Build();
+      }
+      return resultBuilder
+        .Succeed()
+        .WithValue(users[0])
+        .Build();
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Error while searching for user by email: {ex.Message}");
+      return resultBuilder
+        .Fail()
+        .WithGeneralError(500, "An unexpected error occurred while connecting to the database.")
+        .Build();
+    }
   }
 
   public async Task<Result<UserEntity>> GetUserById(string id)
@@ -66,9 +140,32 @@ public class UserRepository : IUserRepository
       .Build();
   }
 
-  public Task<Result> UpdateUser(UserEntity user)
+  public async Task<Result> UpdateUser(UserEntity user)
   {
-    throw new NotImplementedException();
+    ResultBuilder resultBuilder = new();
+    bool isIdUnique = await IsIdUnique(user.Id);
+    if (isIdUnique == true)
+    {
+      return resultBuilder
+        .Fail()
+        .WithGeneralError(404)
+        .Build();
+    }
+    try
+    {
+      await _context.SaveAsync(user);
+      return resultBuilder
+        .Succeed()
+        .Build();
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Error while updating user: {ex.Message}");
+      return resultBuilder
+        .Fail()
+        .WithGeneralError(500, "An unexpected error occurred while connecting to the database.")
+        .Build();
+    }
   }
 
   private async Task<bool> IsIdUnique(string id)

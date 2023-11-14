@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.DataModel;
 using BircheGamesApi;
@@ -33,8 +34,24 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   [Fact]
   public async Task CreateUser_Succeeds_WhenId_IsUnique()
   {
-    // Remember to check that the correct function to create a user on DynamoDBContextMock was called
-    // Not just that the repository reported the result as a success
+    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
+      .WithLoadAsync_UserEntity_Fails()
+      .Build();
+    UserRepository userRepository = new(dBContext);
+
+    string id = "id";
+    UserEntity user = new(){ Id = id };
+
+    Result result = await userRepository.CreateUser(user);
+
+    Assert.True(result.WasSuccess);
+    Assert.Contains(dBContext.MethodsCalled, m => m.Item1 == "SaveAsync");
+  }
+
+  [Fact]
+  public async Task CreateUser_FailsGracefully_WhenContextThrows()
+  {
+
   }
 
   #endregion CreateUser
@@ -44,7 +61,18 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   [Fact]
   public async Task UpdateUser_Fails_WhenUserId_NotFound()
   {
-    // Check that the update user method on context was not called
+    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
+      .WithLoadAsync_UserEntity_Fails()
+      .Build();
+    UserRepository userRepository = new(dBContext);
+
+    string id = "id";
+    UserEntity user = new(){ Id = id };
+
+    Result result = await userRepository.UpdateUser(user);
+
+    Assert.False(result.WasSuccess);
+    Assert.DoesNotContain(dBContext.MethodsCalled, m => m.Item1 == "SaveAsync");
   }
 
   [Fact]
@@ -52,7 +80,111 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   {
     // Remember to check that the correct function to update a user on DynamoDBContextMock was called
     // Not just that the repository reported the result as a success
+    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
+      .WithLoadAsync_UserEntity_Succeeds()
+      .Build();
+    UserRepository userRepository = new(dBContext);
+
+    string id = "id";
+    UserEntity user = new(){ Id = id };
+
+    Result result = await userRepository.UpdateUser(user);
+
+    Assert.True(result.WasSuccess);
+    Assert.Contains(dBContext.MethodsCalled, m => m.Item1 == "SaveAsync");
+  }
+
+  [Fact]
+  public async Task UpdateUser_FailsGracefully_WhenContextThrows()
+  {
+    
   }
 
   #endregion UpdateUser
+
+  #region GetUserByDisplayNameAndTag
+
+  [Fact]
+  public async Task GetUserByDisplayNameAndTag_Fails_WhenNotFound()
+  {
+    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
+      .WithQueryAsync_UserEntity_ReturnsN(0)
+      .Build();
+    UserRepository userRepository = new(dBContext);
+
+    Result result = await userRepository.GetUserByDisplayNameAndTag("", "");
+
+    Assert.False(result.WasSuccess);
+  }
+
+  [Fact]
+  public async Task GetUserByDisplayNameAndTag_Succeeds_WhenFound()
+  {
+    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
+      .WithQueryAsync_UserEntity_ReturnsN(1)
+      .Build();
+    UserRepository userRepository = new(dBContext);
+
+    Result result = await userRepository.GetUserByDisplayNameAndTag("", "");
+
+    Assert.True(result.WasSuccess);
+  }
+
+  [Fact]
+  public async Task GetUserByDisplayNameAndTag_FailsGracefully_AndIndicatesServerError_WhenContextThrows()
+  {
+    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
+      .WithEverythingThrows()
+      .Build();
+    UserRepository userRepository = new(dBContext);
+    Result result = await userRepository.GetUserByDisplayNameAndTag("", "");
+
+    Assert.False(result.WasSuccess);
+    Assert.Contains(result.Errors, e => e.StatusCode == 500);
+  }
+
+  #endregion GetUserByDisplayNameAndTag
+
+  #region GetUserByEmailAddress
+
+  [Fact]
+  public async Task GetUserByEmailAddress_Fails_WhenNotFound()
+  {
+    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
+      .WithQueryAsync_UserEntity_ReturnsN(0)
+      .Build();
+    UserRepository userRepository = new(dBContext);
+
+    Result result = await userRepository.GetUserByEmailAddress("");
+
+    Assert.False(result.WasSuccess);
+  }
+
+  [Fact]
+  public async Task GetUserByEmailAddress_Succeeds_WhenFound()
+  {
+    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
+      .WithQueryAsync_UserEntity_ReturnsN(1)
+      .Build();
+    UserRepository userRepository = new(dBContext);
+
+    Result result = await userRepository.GetUserByEmailAddress("");
+
+    Assert.True(result.WasSuccess);
+  }
+
+  [Fact]
+  public async Task GetUserByEmailAddress_FailsGracefully_AndIndicatesServerError_WhenContextThrows()
+  {
+    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
+      .WithEverythingThrows()
+      .Build();
+    UserRepository userRepository = new(dBContext);
+    Result result = await userRepository.GetUserByEmailAddress("");
+
+    Assert.False(result.WasSuccess);
+    Assert.Contains(result.Errors, e => e.StatusCode == 500);
+  }
+
+  #endregion GetUserByEmailAddress
  }

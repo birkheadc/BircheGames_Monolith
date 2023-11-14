@@ -7,13 +7,13 @@ using Amazon.DynamoDBv2.DocumentModel;
 using BircheGamesApi.Models;
 using Newtonsoft.Json;
 
-#pragma warning disable CS8625
+#pragma warning disable CS8625, CS8619, CS8600
 namespace BircheGamesApiUnitTests.Mocks.ThirdParty;
 
 public class DynamoDBContextMock : IDynamoDBContext
 {
-  public Task<UserEntity>? LoadAsync_UserEntity_Result = null;
-  public AsyncSearch<UserEntity>? QueryAsync_UserEntity_Result = null;
+  public Task<UserEntity?>? LoadAsync_UserEntity_Result = null;
+  public AsyncSearchMock<UserEntity>? QueryAsync_UserEntity_Result = null;
   public readonly List<(string, string[])> MethodsCalled = new();
   public BatchGet<T> CreateBatchGet<T>(DynamoDBOperationConfig operationConfig = null)
   {
@@ -161,7 +161,11 @@ public class DynamoDBContextMock : IDynamoDBContext
       throw new ArgumentException();
     }
 
-    UserEntity user = LoadAsync_UserEntity_Result.Result;
+    UserEntity? user = LoadAsync_UserEntity_Result.Result;
+    if (user is null)
+    {
+      return Task.FromResult((T)(object)null);
+    }
     user.Id = hashKey.ToString() ?? "";
     return Task.FromResult((T)(object)user);
   }
@@ -193,12 +197,28 @@ public class DynamoDBContextMock : IDynamoDBContext
 
   public AsyncSearch<T> QueryAsync<T>(object hashKeyValue, DynamoDBOperationConfig operationConfig = null)
   {
-    throw new NotImplementedException();
+    if (QueryAsync_UserEntity_Result is null)
+    {
+      throw new ArgumentNullException();
+    }
+    if (typeof(T) != typeof(UserEntity))
+    {
+      throw new ArgumentException();
+    }
+    return (AsyncSearch<T>)(object)QueryAsync_UserEntity_Result;
   }
 
   public AsyncSearch<T> QueryAsync<T>(object hashKeyValue, QueryOperator op, IEnumerable<object> values, DynamoDBOperationConfig operationConfig = null)
   {
-    throw new NotImplementedException();
+    if (QueryAsync_UserEntity_Result is null)
+    {
+      throw new ArgumentNullException();
+    }
+    if (typeof(T) != typeof(UserEntity))
+    {
+      throw new ArgumentException();
+    }
+    return (AsyncSearch<T>)(object)QueryAsync_UserEntity_Result;
   }
 
   public void RegisterTableDefinition(Table table)
