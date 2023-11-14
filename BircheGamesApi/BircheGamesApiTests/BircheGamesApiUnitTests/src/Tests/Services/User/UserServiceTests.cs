@@ -16,6 +16,7 @@ public class UserServiceTests
   {
     UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
       .WithAllSuccessfulResult()
+      .WithGetUserByEmailAddressResult(new() { WasSuccess = false })
       .Build();
 
     UserService userService = new
@@ -27,6 +28,7 @@ public class UserServiceTests
     Result result = await userService.RegisterUser(new());
 
     Assert.False(result.WasSuccess);
+    Assert.DoesNotContain(userRepositoryMock.MethodsCalled, m => m.Item1 == "CreateUser");
   }
 
   [Fact]
@@ -34,6 +36,7 @@ public class UserServiceTests
   {
     UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
       .WithAllSuccessfulResult()
+      .WithGetUserByEmailAddressResult(new() { WasSuccess = false })
       .Build();
       
     UserService userService = new
@@ -45,42 +48,27 @@ public class UserServiceTests
     Result result = await userService.RegisterUser(new());
 
     Assert.True(result.WasSuccess);
+    Assert.Contains(userRepositoryMock.MethodsCalled, m => m.Item1 == "CreateUser");
   }
 
   [Fact]
-  public async Task RegisterUser_DoesNotCall_CreateUser_OnRepository_WhenValidatorFails()
+  public async Task RegisterUser_Fails_WhenEmailAddress_NotUnique()
   {
     UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
       .WithAllSuccessfulResult()
+      .WithGetUserByEmailAddressResult(new(){ WasSuccess = true, Value = new() })
       .Build();
-      
-    UserService userService = new
-    (
-      new UserValidatorFactory_Mocks_ReturnsInvalid(),
-      userRepositoryMock
-    );
 
-    Result _ = await userService.RegisterUser(new());
-
-    Assert.Empty(userRepositoryMock.MethodsCalled);
-  }
-
-  [Fact]
-  public async Task RegisterUser_Calls_CreateUser_WithNewUserEntity_OnRepository_WhenValidatorSucceeds()
-  {
-    UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
-      .WithAllSuccessfulResult()
-      .Build();
-      
     UserService userService = new
     (
       new UserValidatorFactory_Mocks_ReturnsValid(),
-      userRepositoryMock
+      userRepositoryMock  
     );
 
     Result result = await userService.RegisterUser(new());
-    
-    Assert.Equal("CreateUser", userRepositoryMock.MethodsCalled[0].Item1);
+
+    Assert.False(result.WasSuccess);
+    Assert.DoesNotContain(userRepositoryMock.MethodsCalled, m => m.Item1 == "CreateUser");
   }
 
   #endregion RegisterUser
@@ -103,6 +91,7 @@ public class UserServiceTests
     Result result = await userService.PatchUserDisplayNameAndTag("", new());
 
     Assert.False(result.WasSuccess);
+    Assert.DoesNotContain(userRepositoryMock.MethodsCalled, m => m.Item1 == "UpdateUser");
   }
 
   [Fact]
@@ -122,32 +111,15 @@ public class UserServiceTests
     Result result = await userService.PatchUserDisplayNameAndTag("", new());
 
     Assert.True(result.WasSuccess);
+    Assert.Contains(userRepositoryMock.MethodsCalled, m => m.Item1 == "UpdateUser");
   }
 
   [Fact]
-  public async Task PatchUserDisplayNameAndTag_DoesNotCall_Repository_WhenValidatorFails()
+  public async Task PatchUserDisplayNameAndTag_Fails_WhenNotUnique()
   {
     UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
       .WithAllSuccessfulResult()
-      .Build();
-      
-    UserService userService = new
-    (
-      new UserValidatorFactory_Mocks_ReturnsInvalid(),
-      userRepositoryMock
-    );
-
-    Result _ = await userService.PatchUserDisplayNameAndTag("", new());
-
-    Assert.Empty(userRepositoryMock.MethodsCalled);
-  }
-
-  [Fact]
-  public async Task PatchUserDisplayNameAndTag_Calls_UpdateUser_OnRepository_WhenValidatorSucceeds()
-  {
-    UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
-      .WithAllSuccessfulResult()
-      .WithGetUserByDisplayNameAndTagResult(new(){ WasSuccess = false })
+      .WithGetUserByDisplayNameAndTagResult(new(){ WasSuccess = true, Value = new() })
       .Build();
       
     UserService userService = new
@@ -158,8 +130,8 @@ public class UserServiceTests
 
     Result result = await userService.PatchUserDisplayNameAndTag("", new());
 
-    Assert.NotEmpty(userRepositoryMock.MethodsCalled);
-    Assert.Contains(userRepositoryMock.MethodsCalled, m => m.Item1 == "UpdateUser");
+    Assert.False(result.WasSuccess);
+    Assert.DoesNotContain(userRepositoryMock.MethodsCalled, m => m.Item1 == "UpdateUser");
   }
 
   #endregion PatchUserDisplayNameAndTag

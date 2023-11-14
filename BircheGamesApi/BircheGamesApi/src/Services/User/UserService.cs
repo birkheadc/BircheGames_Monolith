@@ -87,9 +87,24 @@ public class UserService : IUserService
       return validationResult;
     }
 
+    bool isEmailAddressUnique = await IsEmailAddressUnique(request.EmailAddress);
+    if (isEmailAddressUnique == false)
+    {
+      return new ResultBuilder()
+        .Fail()
+        .WithGeneralError(409)
+        .Build();
+    }
+
     UserEntity user = new(request);
     Result result = await _userRepository.CreateUser(user);
     
-    return result;    
+    return result;
+  }
+
+  private async Task<bool> IsEmailAddressUnique(string emailAddress)
+  {
+    Result result = await _userRepository.GetUserByEmailAddress(emailAddress);
+    return result.WasSuccess == false;
   }
 }
