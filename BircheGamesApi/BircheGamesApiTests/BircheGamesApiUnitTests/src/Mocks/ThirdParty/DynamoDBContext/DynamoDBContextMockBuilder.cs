@@ -16,13 +16,13 @@ public class DynamoDBContextMockBuilder
 
   public DynamoDBContextMockBuilder WithLoadAsync_UserEntity_Succeeds()
   {
-    _dynamoDBContextMock.LoadAsync_UserEntity_Result = Task.FromResult<UserEntity>(new());
+    _dynamoDBContextMock.LoadAsync_UserEntity_Result = Task.FromResult<UserEntity?>(new());
     return this;
   }
 
   public DynamoDBContextMockBuilder WithLoadAsync_UserEntity_Fails()
   {
-    _dynamoDBContextMock.LoadAsync_UserEntity_Result = Task.FromResult<UserEntity>(null);
+    _dynamoDBContextMock.LoadAsync_UserEntity_Result = Task.FromResult<UserEntity?>(null);
     return this;
   }
 

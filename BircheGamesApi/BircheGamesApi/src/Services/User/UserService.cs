@@ -107,4 +107,9 @@ public class UserService : IUserService
     Result result = await _userRepository.GetUserByEmailAddress(emailAddress);
     return result.WasSuccess == false;
   }
+
+  public async Task<Result<UserEntity>> GetUser(string id)
+  {
+    return await _userRepository.GetUserById(id);
+  }
 }
