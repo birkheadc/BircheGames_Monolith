@@ -29,7 +29,7 @@ public class ExtendedControllerBase : ControllerBase
       return BadRequest();
     }
 
-    int statusCode = result.Errors[0].StatusCode ?? 0;
+    int statusCode = GetFirstNonNullStatusCodeOrZeroFromResultErrors(result.Errors);
     
     if (statusCode == 0)
     {
@@ -37,5 +37,10 @@ public class ExtendedControllerBase : ControllerBase
     }
     
     return StatusCode(statusCode, result.Errors);
+  }
+
+  private static int GetFirstNonNullStatusCodeOrZeroFromResultErrors(IEnumerable<ResultError> errors)
+  {
+    return errors.Where(e => e.StatusCode is not null).FirstOrDefault()?.StatusCode ?? 0;
   }
 }

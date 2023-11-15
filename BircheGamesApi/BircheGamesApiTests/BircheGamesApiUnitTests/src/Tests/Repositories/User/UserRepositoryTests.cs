@@ -51,7 +51,15 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   [Fact]
   public async Task CreateUser_FailsGracefully_WhenContextThrows()
   {
+    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
+      .WithEverythingThrows()
+      .Build();
+    UserRepository userRepository = new(dBContext);
 
+    Result result = await userRepository.CreateUser(new());
+
+    Assert.False(result.WasSuccess);
+    Assert.Contains(result.Errors, e => e.StatusCode == 500);
   }
 
   #endregion CreateUser
@@ -78,8 +86,6 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   [Fact]
   public async Task UpdateUser_Succeeds_WhenId_Found()
   {
-    // Remember to check that the correct function to update a user on DynamoDBContextMock was called
-    // Not just that the repository reported the result as a success
     DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
       .WithLoadAsync_UserEntity_Succeeds()
       .Build();
@@ -97,7 +103,15 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   [Fact]
   public async Task UpdateUser_FailsGracefully_WhenContextThrows()
   {
-    
+    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
+      .WithEverythingThrows()
+      .Build();
+    UserRepository userRepository = new(dBContext);
+
+    Result result = await userRepository.UpdateUser(new());
+
+    Assert.False(result.WasSuccess);
+    Assert.Contains(result.Errors, e => e.StatusCode == 500);
   }
 
   #endregion UpdateUser

@@ -18,18 +18,18 @@ public class UserRepository : IUserRepository
   {
     ResultBuilder resultBuilder = new();
 
-    bool isIdUnique = await IsIdUnique(user.Id);
-
-    if (isIdUnique == false)
-    {
-      return resultBuilder
-        .Fail()
-        .WithGeneralError(409)
-        .Build();
-    }
-
     try
     {
+      bool isIdUnique = await IsIdUnique(user.Id);
+
+      if (isIdUnique == false)
+      {
+        return resultBuilder
+          .Fail()
+          .WithGeneralError(409)
+          .Build();
+      }
+
       await _context.SaveAsync(user);
       return resultBuilder
         .Succeed()
@@ -143,16 +143,16 @@ public class UserRepository : IUserRepository
   public async Task<Result> UpdateUser(UserEntity user)
   {
     ResultBuilder resultBuilder = new();
-    bool isIdUnique = await IsIdUnique(user.Id);
-    if (isIdUnique == true)
-    {
-      return resultBuilder
-        .Fail()
-        .WithGeneralError(404)
-        .Build();
-    }
     try
     {
+      bool isIdUnique = await IsIdUnique(user.Id);
+      if (isIdUnique == true)
+      {
+        return resultBuilder
+          .Fail()
+          .WithGeneralError(404)
+          .Build();
+      }
       await _context.SaveAsync(user);
       return resultBuilder
         .Succeed()

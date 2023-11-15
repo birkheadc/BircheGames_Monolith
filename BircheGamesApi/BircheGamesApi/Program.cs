@@ -1,5 +1,12 @@
+using System.Text;
 using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
 using BircheGamesApi.Config;
+using BircheGamesApi.Repositories;
+using BircheGamesApi.Services;
+using BircheGamesApi.Validation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -14,17 +21,57 @@ services.AddSwaggerGen();
 
 services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
 services.AddAWSService<IAmazonDynamoDB>();
+services.AddScoped<IDynamoDBContext, DynamoDBContext>();
 
 AmazonSecrets amazonSecrets = AmazonSecretsRetriever.GetSecrets();
 
 UserValidationConfig userValidationConfig = new();
-// Bind userValidationConfig
+config.GetSection("UserValidationConfig").Bind(userValidationConfig);
+services.AddSingleton(userValidationConfig);
 
 SecurityTokenConfig securityTokenConfig = new();
-// Bind securityTokenConfig to appsettings
+config.GetSection("SecurityTokenConfig").Bind(securityTokenConfig);
+securityTokenConfig.SecretKey = amazonSecrets.AuthenticationSecretKey;
+services.AddSingleton(securityTokenConfig);
 
+EmailVerificationConfig emailVerificationConfig = new();
+config.GetSection("EmailVerificationConfig").Bind(emailVerificationConfig);
+emailVerificationConfig.EmailVerificationSecretKey = amazonSecrets.EmailVerificationSecretKey;
+services.AddSingleton(emailVerificationConfig);
+
+services.AddScoped<IUserRepository, UserRepository>();
+services.AddTransient<IUserValidatorFactory, UserValidatorFactory>();
+services.AddScoped<IUserService, UserService>();
+
+services.AddCors(o => 
+{
+  o.AddPolicy(name: "All", builder =>
+  {
+    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+  });
+});
+
+services.AddAuthentication(options =>
+{
+  options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+  options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+  options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+  options.TokenValidationParameters = new TokenValidationParameters()
+  {
+    ValidIssuer = securityTokenConfig.Issuer,
+    ValidAudience = securityTokenConfig.Audience,
+    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(securityTokenConfig.SecretKey)),
+    ValidateIssuer = true,
+    ValidateAudience = true,
+    ValidateLifetime = true,
+    ValidateIssuerSigningKey = true
+  };
+});
 
 var app = builder.Build();
+app.UseCors("All");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -38,11 +85,13 @@ if (!app.Environment.IsDevelopment())
   app.UseHttpsRedirection();
 }
 
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
-app.MapGet("/", () => "You've reached Birche Games API.");
+Console.WriteLine($"Birche Games API launched in {app.Environment.EnvironmentName} mode.");
+
+app.MapGet("/", () => $"You've reached Birche Games API, running in {app.Environment.EnvironmentName} mode.");
 
 app.Run();
 
