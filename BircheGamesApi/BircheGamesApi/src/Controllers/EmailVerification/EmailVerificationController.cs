@@ -1,5 +1,6 @@
 using BircheGamesApi.Requests;
 using BircheGamesApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BircheGamesApi.Controllers;
@@ -19,6 +20,7 @@ public class EmailVerificationController : ExtendedControllerBase
 
   [HttpPost]
   [Route("generate")]
+  [AllowAnonymous]
   public async Task<IActionResult> GenerateVerificationEmail(GenerateVerificationEmailRequest request)
   {
     Result result = await _emailVerificationService.GenerateAndSendVerificationEmail(request);
@@ -27,6 +29,7 @@ public class EmailVerificationController : ExtendedControllerBase
 
   [HttpPost]
   [Route("verify")]
+  [AllowAnonymous]
   public async Task<IActionResult> VerifyEmail(VerifyEmailRequest request)
   {
     Result result = await _emailVerificationService.VerifyEmail(request);

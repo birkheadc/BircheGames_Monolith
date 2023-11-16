@@ -14,23 +14,19 @@ namespace BircheGamesApi.Controllers;
 public class UserMeController : ExtendedControllerBase
 {
   private readonly IUserService _userService;
-  private readonly string _userId;
 
   public UserMeController(IUserService userService)
   {
     _userService = userService;
-    string? id = GetCurrentUserId();
-    if (id is null)
-    {
-      throw new ArgumentNullException();
-    }
-    _userId = id;
   }
 
   [HttpGet]
   public async Task<ActionResult<UserResponseDto>> GetUser()
   {
-    Result<UserEntity> result = await _userService.GetUser(_userId);
+    string? id = GetCurrentUserId();
+    if (id is null) return Error();
+
+    Result<UserEntity> result = await _userService.GetUser(id);
     if (result.WasSuccess == false)
     {
       return NotFound();
@@ -43,7 +39,10 @@ public class UserMeController : ExtendedControllerBase
   [Route("display-name")]
   public async Task<ActionResult> PatchDisplayNameAndTag([FromBody] ChangeDisplayNameAndTagRequest request)
   {
-    Result result = await _userService.PatchUserDisplayNameAndTag(_userId, request);
+    string? id = GetCurrentUserId();
+    if (id is null) return Error();
+
+    Result result = await _userService.PatchUserDisplayNameAndTag(id, request);
     return ResultToActionResult(result);
   }
 }
