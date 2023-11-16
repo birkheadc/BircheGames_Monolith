@@ -14,7 +14,7 @@ public class DynamoDBContextMock : IDynamoDBContext
 {
   public Task<UserEntity?>? LoadAsync_UserEntity_Result = null;
   public AsyncSearchMock<UserEntity>? QueryAsync_UserEntity_Result = null;
-  public readonly List<(string, string[])> MethodsCalled = new();
+  public readonly List<MethodCall> MethodsCalled = new();
   public BatchGet<T> CreateBatchGet<T>(DynamoDBOperationConfig operationConfig = null)
   {
     throw new NotImplementedException();
@@ -228,7 +228,7 @@ public class DynamoDBContextMock : IDynamoDBContext
 
   public Task SaveAsync<T>(T value, CancellationToken cancellationToken = default)
   {
-    MethodsCalled.Add(("SaveAsync", new[]{JsonConvert.SerializeObject(value)}));
+    MethodsCalled.Add(new(){  MethodName = "SaveAsync", Arguments = new[]{JsonConvert.SerializeObject(value)}});
     return Task.CompletedTask;
   }
 

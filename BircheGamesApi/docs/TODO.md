@@ -4,3 +4,5 @@
 
   - Create EmailService and EmailVerificationService as two separate things. EmailService simply sends email. EmailVerificationService uses EmailService to do the sending, but also processes verification requests and (re)send verification email requests
     - Build them with TDD. Create a mock of the amazon email service and test whether its methods are called properly.
+
+  - Replace "Not Implemented Exceptions" in mocks with a custom exception so that the console is more informative while testing.

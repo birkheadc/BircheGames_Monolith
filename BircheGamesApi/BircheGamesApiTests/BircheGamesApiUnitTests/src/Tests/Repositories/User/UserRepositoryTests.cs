@@ -28,7 +28,7 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
     Result result = await userRepository.CreateUser(user);
 
     Assert.False(result.WasSuccess);
-    Assert.DoesNotContain(dBContext.MethodsCalled, m => m.Item1 == "SaveAsync");
+    Assert.DoesNotContain(dBContext.MethodsCalled, m => m.MethodName == "SaveAsync");
   }
 
   [Fact]
@@ -45,7 +45,7 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
     Result result = await userRepository.CreateUser(user);
 
     Assert.True(result.WasSuccess);
-    Assert.Contains(dBContext.MethodsCalled, m => m.Item1 == "SaveAsync");
+    Assert.Contains(dBContext.MethodsCalled, m => m.MethodName == "SaveAsync");
   }
 
   [Fact]
@@ -80,7 +80,7 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
     Result result = await userRepository.UpdateUser(user);
 
     Assert.False(result.WasSuccess);
-    Assert.DoesNotContain(dBContext.MethodsCalled, m => m.Item1 == "SaveAsync");
+    Assert.DoesNotContain(dBContext.MethodsCalled, m => m.MethodName == "SaveAsync");
   }
 
   [Fact]
@@ -97,7 +97,7 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
     Result result = await userRepository.UpdateUser(user);
 
     Assert.True(result.WasSuccess);
-    Assert.Contains(dBContext.MethodsCalled, m => m.Item1 == "SaveAsync");
+    Assert.Contains(dBContext.MethodsCalled, m => m.MethodName == "SaveAsync");
   }
 
   [Fact]

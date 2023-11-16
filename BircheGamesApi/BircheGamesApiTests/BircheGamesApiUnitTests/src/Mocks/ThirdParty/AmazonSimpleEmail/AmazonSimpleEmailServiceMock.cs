@@ -1,14 +1,19 @@
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon.Runtime;
 using Amazon.Runtime.Endpoints;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
+using Newtonsoft.Json;
 
 namespace BircheGamesApiUnitTests.Mocks.ThirdParty;
 
 public class AmazonSimpleEmailServiceMock : IAmazonSimpleEmailService
 {
+  public List<MethodCall> MethodCalls = new();
+  public Dictionary<string, MethodResponse> MethodResponses = new();
   public ISimpleEmailPaginatorFactory Paginators => throw new System.NotImplementedException();
 
   public IClientConfig Config => throw new System.NotImplementedException();
@@ -285,7 +290,27 @@ public class AmazonSimpleEmailServiceMock : IAmazonSimpleEmailService
 
   public Task<SendEmailResponse> SendEmailAsync(SendEmailRequest request, CancellationToken cancellationToken = default)
   {
-    throw new System.NotImplementedException();
+    MethodCalls.Add(new(){ MethodName = "SendEmailAsync", Arguments = new[]{ JsonConvert.SerializeObject(request), JsonConvert.SerializeObject(cancellationToken) }});
+
+    MethodResponse response = MethodResponses["SendEmailAsync"];
+
+    if (response == MethodResponse.THROW)
+    {
+      throw new NotImplementedException();
+    }
+
+    if (response == MethodResponse.FAILURE)
+    {
+      return Task.FromResult(new SendEmailResponse()
+      {
+        HttpStatusCode = System.Net.HttpStatusCode.BadGateway
+      });
+    }
+
+    return Task.FromResult(new SendEmailResponse()
+    {
+      HttpStatusCode = System.Net.HttpStatusCode.OK
+    });
   }
 
   public Task<SendRawEmailResponse> SendRawEmailAsync(SendRawEmailRequest request, CancellationToken cancellationToken = default)

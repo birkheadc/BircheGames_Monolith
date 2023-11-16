@@ -28,7 +28,7 @@ public class UserServiceTests
     Result result = await userService.RegisterUser(new());
 
     Assert.False(result.WasSuccess);
-    Assert.DoesNotContain(userRepositoryMock.MethodsCalled, m => m.Item1 == "CreateUser");
+    Assert.DoesNotContain(userRepositoryMock.MethodCalls, m => m.MethodName == "CreateUser");
   }
 
   [Fact]
@@ -48,7 +48,7 @@ public class UserServiceTests
     Result result = await userService.RegisterUser(new());
 
     Assert.True(result.WasSuccess);
-    Assert.Contains(userRepositoryMock.MethodsCalled, m => m.Item1 == "CreateUser");
+    Assert.Contains(userRepositoryMock.MethodCalls, m => m.MethodName == "CreateUser");
   }
 
   [Fact]
@@ -68,7 +68,7 @@ public class UserServiceTests
     Result result = await userService.RegisterUser(new());
 
     Assert.False(result.WasSuccess);
-    Assert.DoesNotContain(userRepositoryMock.MethodsCalled, m => m.Item1 == "CreateUser");
+    Assert.DoesNotContain(userRepositoryMock.MethodCalls, m => m.MethodName == "CreateUser");
   }
 
   #endregion RegisterUser
@@ -91,7 +91,7 @@ public class UserServiceTests
     Result result = await userService.PatchUserDisplayNameAndTag("", new());
 
     Assert.False(result.WasSuccess);
-    Assert.DoesNotContain(userRepositoryMock.MethodsCalled, m => m.Item1 == "UpdateUser");
+    Assert.DoesNotContain(userRepositoryMock.MethodCalls, m => m.MethodName == "UpdateUser");
   }
 
   [Fact]
@@ -111,7 +111,7 @@ public class UserServiceTests
     Result result = await userService.PatchUserDisplayNameAndTag("", new());
 
     Assert.True(result.WasSuccess);
-    Assert.Contains(userRepositoryMock.MethodsCalled, m => m.Item1 == "UpdateUser");
+    Assert.Contains(userRepositoryMock.MethodCalls, m => m.MethodName == "UpdateUser");
   }
 
   [Fact]
@@ -131,7 +131,7 @@ public class UserServiceTests
     Result result = await userService.PatchUserDisplayNameAndTag("", new());
 
     Assert.False(result.WasSuccess);
-    Assert.DoesNotContain(userRepositoryMock.MethodsCalled, m => m.Item1 == "UpdateUser");
+    Assert.DoesNotContain(userRepositoryMock.MethodCalls, m => m.MethodName == "UpdateUser");
   }
 
   #endregion PatchUserDisplayNameAndTag

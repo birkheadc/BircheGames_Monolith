@@ -17,23 +17,23 @@ public class UserRepositoryMock : IUserRepository
   public Result<UserEntity> GetUserByEmailAddressResult = new();
   public Result UpdateUserResult = new();
 
-  public readonly List<(string, string[])> MethodsCalled = new();
+  public readonly List<MethodCall> MethodCalls = new();
 
   public Task<Result> CreateUser(UserEntity user)
   {
-    MethodsCalled.Add(("CreateUser", new[]{JsonConvert.SerializeObject(user)}));
+    MethodCalls.Add(new(){ MethodName = "CreateUser", Arguments = new[]{JsonConvert.SerializeObject(user)}});
     return Task.FromResult(CreateUserResult);
   }
 
   public Task<Result> DeleteUser(string id)
   {
-    MethodsCalled.Add(("DeleteUser", new[]{id}));
+    MethodCalls.Add(new(){ MethodName = "DeleteUser", Arguments = new[]{id}});
     return Task.FromResult(DeleteUserResult);
   }
 
   public Task<Result<UserEntity>> GetUserByDisplayNameAndTag(string displayName, string tag)
   {
-    MethodsCalled.Add(("GetUserByDisplayNameAndTag", new[]{ displayName, tag }));
+    MethodCalls.Add(new(){ MethodName = "GetUserByDisplayNameAndTag", Arguments = new[]{ displayName, tag }});
     if (GetUserByDisplayNameAndTagResult.WasSuccess)
     {
       if (GetUserByDisplayNameAndTagResult.Value is null)
@@ -49,7 +49,7 @@ public class UserRepositoryMock : IUserRepository
 
   public Task<Result<UserEntity>> GetUserById(string id)
   {
-    MethodsCalled.Add(("GetUserById", new[]{id}));
+    MethodCalls.Add(new(){ MethodName = "GetUserById", Arguments = new[]{id}});
     if (GetUserByIdResult.WasSuccess)
     {
       if (GetUserByIdResult.Value is null)
@@ -63,7 +63,7 @@ public class UserRepositoryMock : IUserRepository
 
   public Task<Result<UserEntity>> GetUserByEmailAddress(string emailAddress)
   {
-    MethodsCalled.Add(("GetUserByEmailAddress", new[]{emailAddress}));
+    MethodCalls.Add(new(){ MethodName = "GetUserByEmailAddress", Arguments = new[]{emailAddress}});
     if (GetUserByEmailAddressResult.WasSuccess)
     {
       if (GetUserByEmailAddressResult.Value is null)
@@ -77,7 +77,7 @@ public class UserRepositoryMock : IUserRepository
 
   public Task<Result> UpdateUser(UserEntity user)
   {
-    MethodsCalled.Add(("UpdateUser", new[]{JsonConvert.SerializeObject(user)}));
+    MethodCalls.Add(new(){ MethodName = "UpdateUser", Arguments = new[]{JsonConvert.SerializeObject(user)}});
     return Task.FromResult(UpdateUserResult);
   }
 }

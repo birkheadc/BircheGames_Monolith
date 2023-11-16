@@ -8,4 +8,10 @@ public class AmazonSimpleEmailServiceMockBuilder
   {
     return _amazonSimpleEmailServiceMock;
   }
+
+  public AmazonSimpleEmailServiceMockBuilder WithMethodResponse(string method, MethodResponse response)
+  {
+    _amazonSimpleEmailServiceMock.MethodResponses.Add(method, response);
+    return this;
+  }
 }

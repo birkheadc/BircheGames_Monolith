@@ -45,19 +45,28 @@ public class EmailService : IEmailService
       Message = message
     };
 
-    SendEmailResponse response = await _amazonSimpleEmailService.SendEmailAsync(request);
-
-    if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
+    try
     {
+      SendEmailResponse response = await _amazonSimpleEmailService.SendEmailAsync(request);
+
+      if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
+      {
+        return resultBuilder
+          .Succeed()
+          .Build();
+      }
       return resultBuilder
-        .Succeed()
+        .Fail()
+        .WithGeneralError((int)response.HttpStatusCode)
         .Build();
     }
-    return resultBuilder
-      .Fail()
-      .WithGeneralError((int)response.HttpStatusCode)
-      .Build();
-
-    throw new NotImplementedException();
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Exception encountered when attempting to Send Email Async: {ex.Message}");
+      return resultBuilder
+        .Fail()
+        .WithGeneralError(500, "Error when attempting to connect to AWS service.")
+        .Build();
+    }
   }
 }
