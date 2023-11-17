@@ -5,12 +5,5 @@
   - Create EmailService and EmailVerificationService as two separate things. EmailService simply sends email. EmailVerificationService uses EmailService to do the sending, but also processes verification requests and (re)send verification email requests
     - Build them with TDD. Create a mock of the amazon email service and test whether its methods are called properly.
 
-  - Replace "Not Implemented Exceptions" in mocks with a custom exception so that the console is more informative while testing.
-
   - Test SecurityTokenGenerator against SecurityTokenValidator and program's authentication to make sure they are compatible
     - Also, is there a better way to AddAuthorization in program? Maybe tell it to use a specific class rather than just write the code in program.cs?
-
-  - Rewrite unit tests to use:
-    - Basic Mock abstract class
-    - Intentional Exception rather than Not Implemented
-      - (Not implemented can be left on methods that are not implemented, but throw intentional when... intentional)
