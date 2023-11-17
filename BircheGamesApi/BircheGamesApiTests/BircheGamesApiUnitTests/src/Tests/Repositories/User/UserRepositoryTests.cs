@@ -18,7 +18,7 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   [Fact]
   public async Task CreateUser_Fails_WhenId_NotUnique()
   {
-    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
+    DynamoDBContextMock dBContext = new BasicMockBuilder<DynamoDBContextMock>()
       .WithMethodResponse("LoadAsync", MethodResponse.SUCCESS)
       .Build();
     UserRepository userRepository = new(dBContext);
@@ -35,7 +35,7 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   [Fact]
   public async Task CreateUser_Succeeds_WhenId_IsUnique()
   {
-    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
+    DynamoDBContextMock dBContext = new BasicMockBuilder<DynamoDBContextMock>()
       .WithMethodResponse("LoadAsync", MethodResponse.FAILURE)
       .Build();
     UserRepository userRepository = new(dBContext);
@@ -52,8 +52,7 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   [Fact]
   public async Task CreateUser_FailsGracefully_WhenContextThrows()
   {
-    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
-      .WithEverythingThrows()
+    DynamoDBContextMock dBContext = new BasicMockBuilder<DynamoDBContextMock>()
       .Build();
     UserRepository userRepository = new(dBContext);
 
@@ -70,7 +69,7 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   [Fact]
   public async Task UpdateUser_Fails_WhenUserId_NotFound()
   {
-    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
+    DynamoDBContextMock dBContext = new BasicMockBuilder<DynamoDBContextMock>()
       .WithMethodResponse("LoadAsync", MethodResponse.FAILURE)
       .Build();
     UserRepository userRepository = new(dBContext);
@@ -87,7 +86,7 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   [Fact]
   public async Task UpdateUser_Succeeds_WhenId_Found()
   {
-    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
+    DynamoDBContextMock dBContext = new BasicMockBuilder<DynamoDBContextMock>()
       .WithMethodResponse("LoadAsync", MethodResponse.SUCCESS)
       .Build();
     UserRepository userRepository = new(dBContext);
@@ -104,8 +103,7 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   [Fact]
   public async Task UpdateUser_FailsGracefully_WhenContextThrows()
   {
-    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
-      .WithEverythingThrows()
+    DynamoDBContextMock dBContext = new BasicMockBuilder<DynamoDBContextMock>()
       .Build();
     UserRepository userRepository = new(dBContext);
 
@@ -122,7 +120,7 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   [Fact]
   public async Task GetUserByDisplayNameAndTag_Fails_WhenNotFound()
   {
-    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
+    DynamoDBContextMock dBContext = new BasicMockBuilder<DynamoDBContextMock>()
       .WithMethodResponse("QueryAsync", MethodResponse.FAILURE)
       .Build();
     UserRepository userRepository = new(dBContext);
@@ -135,7 +133,7 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   [Fact]
   public async Task GetUserByDisplayNameAndTag_Succeeds_WhenFound()
   {
-    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
+    DynamoDBContextMock dBContext = new BasicMockBuilder<DynamoDBContextMock>()
       .WithMethodResponse("QueryAsync", MethodResponse.SUCCESS)
       .Build();
     UserRepository userRepository = new(dBContext);
@@ -148,8 +146,7 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   [Fact]
   public async Task GetUserByDisplayNameAndTag_FailsGracefully_AndIndicatesServerError_WhenContextThrows()
   {
-    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
-      .WithEverythingThrows()
+    DynamoDBContextMock dBContext = new BasicMockBuilder<DynamoDBContextMock>()
       .Build();
     UserRepository userRepository = new(dBContext);
     Result result = await userRepository.GetUserByDisplayNameAndTag("", "");
@@ -165,7 +162,7 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   [Fact]
   public async Task GetUserByEmailAddress_Fails_WhenNotFound()
   {
-    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
+    DynamoDBContextMock dBContext = new BasicMockBuilder<DynamoDBContextMock>()
       .WithMethodResponse("QueryAsync", MethodResponse.FAILURE)
       .Build();
     UserRepository userRepository = new(dBContext);
@@ -178,7 +175,7 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   [Fact]
   public async Task GetUserByEmailAddress_Succeeds_WhenFound()
   {
-    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
+    DynamoDBContextMock dBContext = new BasicMockBuilder<DynamoDBContextMock>()
       .WithMethodResponse("QueryAsync", MethodResponse.SUCCESS)
       .Build();
     UserRepository userRepository = new(dBContext);
@@ -191,8 +188,7 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   [Fact]
   public async Task GetUserByEmailAddress_FailsGracefully_AndIndicatesServerError_WhenContextThrows()
   {
-    DynamoDBContextMock dBContext = new DynamoDBContextMockBuilder()
-      .WithEverythingThrows()
+    DynamoDBContextMock dBContext = new BasicMockBuilder<DynamoDBContextMock>()
       .Build();
     UserRepository userRepository = new(dBContext);
     Result result = await userRepository.GetUserByEmailAddress("");

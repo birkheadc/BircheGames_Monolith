@@ -13,10 +13,12 @@ public class EmailVerificationServiceTests
   [Fact]
   public async Task GenerateAndSendVerificationEmail_FailsWhen_UserNotFound()
   {
-    EmailServiceMock emailServiceMock = new EmailServiceMockBuilder()
+    EmailServiceMock emailServiceMock = new BasicMockBuilder<EmailServiceMock>()
       .Build();
-    UserServiceMock userServiceMock = new UserServiceMockBuilder()
+    UserServiceMock userServiceMock = new BasicMockBuilder<UserServiceMock>()
       .WithMethodResponse("GetUserByEmailAddress", MethodResponse.FAILURE)
+      .Build();
+    SecurityTokenValidatorMock securityTokenValidatorMock = new BasicMockBuilder<SecurityTokenValidatorMock>()
       .Build();
 
     EmailVerificationService emailVerificationService = new
@@ -24,7 +26,8 @@ public class EmailVerificationServiceTests
       new SecurityTokenGenerator(SecurityTokenConfig_Mocks.Default),
       emailServiceMock,
       EmailVerificationConfig_Mocks.Default,
-      userServiceMock
+      userServiceMock,
+      securityTokenValidatorMock
     );
 
     Result result = await emailVerificationService.GenerateAndSendVerificationEmail(new());
@@ -34,11 +37,13 @@ public class EmailVerificationServiceTests
   [Fact]
   public async Task GenerateAndSendVerificationEmail_Calls_EmailServiceSendEmail()
   {
-    EmailServiceMock emailServiceMock = new EmailServiceMockBuilder()
+    EmailServiceMock emailServiceMock = new BasicMockBuilder<EmailServiceMock>()
       .WithMethodResponse("SendEmail", MethodResponse.SUCCESS)
       .Build();
-    UserServiceMock userServiceMock = new UserServiceMockBuilder()
+    UserServiceMock userServiceMock = new BasicMockBuilder<UserServiceMock>()
       .WithMethodResponse("GetUserByEmailAddress", MethodResponse.SUCCESS)
+      .Build();
+    SecurityTokenValidatorMock securityTokenValidatorMock = new BasicMockBuilder<SecurityTokenValidatorMock>()
       .Build();
 
     EmailVerificationService emailVerificationService = new
@@ -46,11 +51,18 @@ public class EmailVerificationServiceTests
       new SecurityTokenGenerator(SecurityTokenConfig_Mocks.Default),
       emailServiceMock,
       EmailVerificationConfig_Mocks.Default,
-      userServiceMock
+      userServiceMock,
+      securityTokenValidatorMock
     );
 
     Result result = await emailVerificationService.GenerateAndSendVerificationEmail(new());
     Assert.True(result.WasSuccess);
     Assert.Contains(emailServiceMock.MethodCalls, m => m.MethodName == "SendEmail");
+  }
+
+  [Fact]
+  public async Task VerifyEmail_FailsWhen_TokenValidatorFails()
+  {
+    
   }
 }

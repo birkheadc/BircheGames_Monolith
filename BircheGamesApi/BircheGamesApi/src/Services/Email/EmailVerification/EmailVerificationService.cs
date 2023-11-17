@@ -11,19 +11,21 @@ public class EmailVerificationService : IEmailVerificationService
   private readonly IEmailService _emailService;
   private readonly ISecurityTokenGenerator _securityTokenGenerator;
   private readonly IUserService _userService;
+  private readonly ISecurityTokenValidator _securityTokenValidator;
 
   public EmailVerificationService
   (
     ISecurityTokenGenerator securityTokenGenerator,
     IEmailService emailService,
     EmailVerificationConfig config,
-    IUserService userService
-  )
+    IUserService userService,
+    ISecurityTokenValidator securityTokenValidator)
   {
     _securityTokenGenerator = securityTokenGenerator;
     _emailService = emailService;
     _config = config;
     _userService = userService;
+    _securityTokenValidator = securityTokenValidator;
   }
 
   public async Task<Result> GenerateAndSendVerificationEmail(GenerateVerificationEmailRequest request)
