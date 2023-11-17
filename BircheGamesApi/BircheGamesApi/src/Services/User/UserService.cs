@@ -112,4 +112,9 @@ public class UserService : IUserService
   {
     return await _userRepository.GetUserById(id);
   }
+
+  public Task<Result<UserEntity>> GetUserByEmailAddress(string emailAddress)
+  {
+    return _userRepository.GetUserByEmailAddress(emailAddress);
+  }
 }

@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
@@ -36,12 +37,14 @@ services.AddSingleton(securityTokenConfig);
 
 EmailVerificationConfig emailVerificationConfig = new();
 config.GetSection("EmailVerificationConfig").Bind(emailVerificationConfig);
-emailVerificationConfig.EmailVerificationSecretKey = amazonSecrets.EmailVerificationSecretKey;
+emailVerificationConfig.SecurityTokenConfig.SecretKey = amazonSecrets.EmailVerificationSecretKey;
 services.AddSingleton(emailVerificationConfig);
 
 services.AddScoped<IUserRepository, UserRepository>();
 services.AddTransient<IUserValidatorFactory, UserValidatorFactory>();
 services.AddScoped<IUserService, UserService>();
+
+services.AddTransient<JwtSecurityTokenHandler>();
 
 services.AddCors(o => 
 {

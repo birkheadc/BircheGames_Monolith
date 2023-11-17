@@ -2,10 +2,6 @@ namespace BircheGamesApi.Config;
 
 public class EmailVerificationConfig
 {
-  public string EmailVerificationSecretKey { get; set; } = "";
-  public int LifespanHours { get; set; } = 1;
-  public string Issuer { get; set; } = "";
-  public string Audience { get; set; } = "";
-  public string VerificationEmailTemplatePath { get; set; } = "";
+  public SecurityTokenConfig SecurityTokenConfig { get; set; } = new();
   public string SenderAddress { get; set; } = "";
 }
