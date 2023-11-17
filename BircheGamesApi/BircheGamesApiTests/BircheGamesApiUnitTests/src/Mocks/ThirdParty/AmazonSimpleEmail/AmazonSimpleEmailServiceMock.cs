@@ -10,10 +10,8 @@ using Newtonsoft.Json;
 
 namespace BircheGamesApiUnitTests.Mocks.ThirdParty;
 
-public class AmazonSimpleEmailServiceMock : IAmazonSimpleEmailService
+public class AmazonSimpleEmailServiceMock : BasicMock, IAmazonSimpleEmailService
 {
-  public List<MethodCall> MethodCalls = new();
-  public Dictionary<string, MethodResponse> MethodResponses = new();
   public ISimpleEmailPaginatorFactory Paginators => throw new System.NotImplementedException();
 
   public IClientConfig Config => throw new System.NotImplementedException();

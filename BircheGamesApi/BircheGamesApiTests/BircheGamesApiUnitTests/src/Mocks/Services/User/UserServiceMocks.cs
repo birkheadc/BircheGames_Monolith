@@ -8,10 +8,8 @@ using BircheGamesApiUnitTests.Mocks.Exceptions;
 
 namespace BircheGamesApiUnitTests.Mocks.Services;
 
-public class UserServiceMock : IUserService
+public class UserServiceMock : BasicMock, IUserService
 {
-  public List<MethodCall> MethodCalls = new();
-  public Dictionary<string, MethodResponse> MethodResponses = new();
   public Task<Result<UserEntity>> GetUser(string id)
   {
     throw new System.NotImplementedException();

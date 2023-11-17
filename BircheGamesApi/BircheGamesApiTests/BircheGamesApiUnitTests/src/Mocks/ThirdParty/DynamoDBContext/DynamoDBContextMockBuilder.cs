@@ -14,28 +14,34 @@ public class DynamoDBContextMockBuilder
     return _dynamoDBContextMock;
   }
 
-  public DynamoDBContextMockBuilder WithLoadAsync_UserEntity_Succeeds()
+  public DynamoDBContextMockBuilder WithMethodResponse(string method, MethodResponse response)
   {
-    _dynamoDBContextMock.LoadAsync_UserEntity_Result = Task.FromResult<UserEntity?>(new());
+    _dynamoDBContextMock.MethodResponses.Add(method, response);
     return this;
   }
 
-  public DynamoDBContextMockBuilder WithLoadAsync_UserEntity_Fails()
-  {
-    _dynamoDBContextMock.LoadAsync_UserEntity_Result = Task.FromResult<UserEntity?>(null);
-    return this;
-  }
+  // public DynamoDBContextMockBuilder WithLoadAsync_UserEntity_Succeeds()
+  // {
+  //   _dynamoDBContextMock.LoadAsync_UserEntity_Result = Task.FromResult<UserEntity?>(new());
+  //   return this;
+  // }
 
-  public DynamoDBContextMockBuilder WithQueryAsync_UserEntity_ReturnsN(int n)
-  {
-    List<UserEntity> users = new();
-    for (int i = 0; i < n; i++)
-    {
-      users.Add(new());
-    }
-    _dynamoDBContextMock.QueryAsync_UserEntity_Result = new AsyncSearchMock<UserEntity>(users);
-    return this;
-  }
+  // public DynamoDBContextMockBuilder WithLoadAsync_UserEntity_Fails()
+  // {
+  //   _dynamoDBContextMock.LoadAsync_UserEntity_Result = Task.FromResult<UserEntity?>(null);
+  //   return this;
+  // }
+
+  // public DynamoDBContextMockBuilder WithQueryAsync_UserEntity_ReturnsN(int n)
+  // {
+  //   List<UserEntity> users = new();
+  //   for (int i = 0; i < n; i++)
+  //   {
+  //     users.Add(new());
+  //   }
+  //   _dynamoDBContextMock.QueryAsync_UserEntity_Result = new AsyncSearchMock<UserEntity>(users);
+  //   return this;
+  // }
 
   public DynamoDBContextMockBuilder WithEverythingThrows()
   {

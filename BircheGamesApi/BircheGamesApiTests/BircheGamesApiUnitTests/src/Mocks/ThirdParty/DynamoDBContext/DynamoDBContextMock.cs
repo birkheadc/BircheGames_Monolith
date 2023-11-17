@@ -5,16 +5,14 @@ using System.Threading.Tasks;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
 using BircheGamesApi.Models;
+using BircheGamesApiUnitTests.Mocks.Exceptions;
 using Newtonsoft.Json;
 
 #pragma warning disable CS8625, CS8619, CS8600
 namespace BircheGamesApiUnitTests.Mocks.ThirdParty;
 
-public class DynamoDBContextMock : IDynamoDBContext
+public class DynamoDBContextMock : BasicMock, IDynamoDBContext
 {
-  public Task<UserEntity?>? LoadAsync_UserEntity_Result = null;
-  public AsyncSearchMock<UserEntity>? QueryAsync_UserEntity_Result = null;
-  public readonly List<MethodCall> MethodsCalled = new();
   public BatchGet<T> CreateBatchGet<T>(DynamoDBOperationConfig operationConfig = null)
   {
     throw new NotImplementedException();
@@ -152,22 +150,38 @@ public class DynamoDBContextMock : IDynamoDBContext
 
   public Task<T> LoadAsync<T>(object hashKey, CancellationToken cancellationToken = default)
   {
-    if (LoadAsync_UserEntity_Result is null)
+    MethodResponse response = MethodResponses["LoadAsync"];
+    switch (response)
     {
-      throw new ArgumentNullException();
+      case MethodResponse.THROW:
+        throw new IntentionalException();
+      case MethodResponse.FAILURE:
+        return Task.FromResult((T)(object)null);
+      case MethodResponse.SUCCESS:
+        UserEntity user = new()
+        {
+          Id = hashKey.ToString() ?? ""
+        };
+        return Task.FromResult((T)(object)user);
+      default:
+        throw new NotImplementedException();
     }
-    if (typeof(T) != typeof(UserEntity))
-    {
-      throw new ArgumentException();
-    }
+    // if (LoadAsync_UserEntity_Result is null)
+    // {
+    //   throw new ArgumentNullException();
+    // }
+    // if (typeof(T) != typeof(UserEntity))
+    // {
+    //   throw new ArgumentException();
+    // }
 
-    UserEntity? user = LoadAsync_UserEntity_Result.Result;
-    if (user is null)
-    {
-      return Task.FromResult((T)(object)null);
-    }
-    user.Id = hashKey.ToString() ?? "";
-    return Task.FromResult((T)(object)user);
+    // UserEntity? user = LoadAsync_UserEntity_Result.Result;
+    // if (user is null)
+    // {
+    //   return Task.FromResult((T)(object)null);
+    // }
+    // user.Id = hashKey.ToString() ?? "";
+    // return Task.FromResult((T)(object)user);
   }
 
   public Task<T> LoadAsync<T>(object hashKey, DynamoDBOperationConfig operationConfig, CancellationToken cancellationToken = default)
@@ -197,28 +211,52 @@ public class DynamoDBContextMock : IDynamoDBContext
 
   public AsyncSearch<T> QueryAsync<T>(object hashKeyValue, DynamoDBOperationConfig operationConfig = null)
   {
-    if (QueryAsync_UserEntity_Result is null)
+    MethodResponse response = MethodResponses["QueryAsync"];
+    switch (response)
     {
-      throw new ArgumentNullException();
+      case MethodResponse.THROW:
+        throw new IntentionalException();
+      case MethodResponse.FAILURE:
+        return (AsyncSearch<T>)(object)new AsyncSearchMock<UserEntity>(new List<UserEntity>());
+      case MethodResponse.SUCCESS:
+        return (AsyncSearch<T>)(object)new AsyncSearchMock<UserEntity>(new List<UserEntity>(){ new() });
+      default:
+        throw new NotImplementedException();
     }
-    if (typeof(T) != typeof(UserEntity))
-    {
-      throw new ArgumentException();
-    }
-    return (AsyncSearch<T>)(object)QueryAsync_UserEntity_Result;
+    // if (QueryAsync_UserEntity_Result is null)
+    // {
+    //   throw new ArgumentNullException();
+    // }
+    // if (typeof(T) != typeof(UserEntity))
+    // {
+    //   throw new ArgumentException();
+    // }
+    // return (AsyncSearch<T>)(object)QueryAsync_UserEntity_Result;
   }
 
   public AsyncSearch<T> QueryAsync<T>(object hashKeyValue, QueryOperator op, IEnumerable<object> values, DynamoDBOperationConfig operationConfig = null)
   {
-    if (QueryAsync_UserEntity_Result is null)
+    MethodResponse response = MethodResponses["QueryAsync"];
+    switch (response)
     {
-      throw new ArgumentNullException();
+      case MethodResponse.THROW:
+        throw new IntentionalException();
+      case MethodResponse.FAILURE:
+        return (AsyncSearch<T>)(object)new AsyncSearchMock<UserEntity>(new List<UserEntity>());
+      case MethodResponse.SUCCESS:
+        return (AsyncSearch<T>)(object)new AsyncSearchMock<UserEntity>(new List<UserEntity>(){ new() });
+      default:
+        throw new NotImplementedException();
     }
-    if (typeof(T) != typeof(UserEntity))
-    {
-      throw new ArgumentException();
-    }
-    return (AsyncSearch<T>)(object)QueryAsync_UserEntity_Result;
+    // if (QueryAsync_UserEntity_Result is null)
+    // {
+    //   throw new ArgumentNullException();
+    // }
+    // if (typeof(T) != typeof(UserEntity))
+    // {
+    //   throw new ArgumentException();
+    // }
+    // return (AsyncSearch<T>)(object)QueryAsync_UserEntity_Result;
   }
 
   public void RegisterTableDefinition(Table table)
@@ -228,7 +266,7 @@ public class DynamoDBContextMock : IDynamoDBContext
 
   public Task SaveAsync<T>(T value, CancellationToken cancellationToken = default)
   {
-    MethodsCalled.Add(new(){  MethodName = "SaveAsync", Arguments = new[]{JsonConvert.SerializeObject(value)}});
+    MethodCalls.Add(new(){  MethodName = "SaveAsync", Arguments = new[]{JsonConvert.SerializeObject(value)}});
     return Task.CompletedTask;
   }
 
