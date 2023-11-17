@@ -6,6 +6,7 @@ using Amazon.Runtime;
 using Amazon.Runtime.Endpoints;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
+using BircheGamesApiUnitTests.Mocks.Exceptions;
 using Newtonsoft.Json;
 
 namespace BircheGamesApiUnitTests.Mocks.ThirdParty;
@@ -294,7 +295,7 @@ public class AmazonSimpleEmailServiceMock : BasicMock, IAmazonSimpleEmailService
 
     if (response == MethodResponse.THROW)
     {
-      throw new NotImplementedException();
+      throw new IntentionalException();
     }
 
     if (response == MethodResponse.FAILURE)
