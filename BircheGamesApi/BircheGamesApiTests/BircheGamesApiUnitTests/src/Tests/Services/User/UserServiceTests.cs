@@ -141,7 +141,40 @@ public class UserServiceTests
   [Fact]
   public async Task ValidateUserEmail_Fails_WhenUserNotFound()
   {
-    
+    UserRepositoryMock userRepositoryMock = new BasicMockBuilder<UserRepositoryMock>()
+      .WithMethodResponse("GetUserById", MethodResponse.FAILURE)
+      .Build();
+
+    UserService userService = new
+    (
+      new UserValidatorFactory_Mocks_ReturnsValid(),
+      userRepositoryMock
+    );
+
+    Result result = await userService.ValidateUserEmail("");
+
+    Assert.False(result.WasSuccess);
+    Assert.DoesNotContain(userRepositoryMock.MethodCalls, m => m.MethodName == "UpdateUser");
+  }
+
+  [Fact]
+  public async Task ValidateUserEmail_Calls_UpdateUser_WhenSucceeds()
+  {
+    UserRepositoryMock userRepositoryMock = new BasicMockBuilder<UserRepositoryMock>()
+      .WithMethodResponse("GetUserById", MethodResponse.SUCCESS)
+      .WithMethodResponse("UpdateUser", MethodResponse.SUCCESS)
+      .Build();
+
+    UserService userService = new
+    (
+      new UserValidatorFactory_Mocks_ReturnsValid(),
+      userRepositoryMock
+    );
+
+    Result result = await userService.ValidateUserEmail("");
+
+    Assert.True(result.WasSuccess);
+    Assert.Contains(userRepositoryMock.MethodCalls, m => m.MethodName == "UpdateUser");
   }
 
   #endregion ValidateUserEmail

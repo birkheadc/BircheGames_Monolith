@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using BircheGamesApiUnitTests.Mocks.Exceptions;
 
 namespace BircheGamesApiUnitTests.Mocks;
 
@@ -8,10 +9,10 @@ public abstract class BasicMock
   public Dictionary<string, MethodResponse> MethodResponses = new();
   internal MethodResponse GetMethodResponse(string methodName)
   {
-    if (MethodResponses.ContainsKey(methodName))
+    if (!MethodResponses.ContainsKey(methodName))
     {
-      return MethodResponses[methodName];
+      throw new MethodResponseNotSetException(methodName);
     }
-    return MethodResponse.THROW;
+    return MethodResponses[methodName];
   }
 }
