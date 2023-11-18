@@ -8,11 +8,13 @@ public class SecurityTokenService : ISecurityTokenService
 {
   private readonly IUserRepository _userRepository;
   private readonly ISecurityTokenGenerator _securityTokenGenerator;
-  
-  public SecurityTokenService(IUserRepository userRepository, ISecurityTokenGenerator securityTokenGenerator)
+  private readonly IPasswordVerifier _passwordVerifier;
+
+  public SecurityTokenService(IUserRepository userRepository, ISecurityTokenGenerator securityTokenGenerator, IPasswordVerifier passwordVerifier)
   {
     _userRepository = userRepository;
     _securityTokenGenerator = securityTokenGenerator;
+    _passwordVerifier = passwordVerifier;
   }
 
   public async Task<Result<SecurityTokenWrapper>> AuthenticateUser(LoginCredentials credentials)
@@ -28,7 +30,7 @@ public class SecurityTokenService : ISecurityTokenService
         .Build();
     }
 
-    bool isPasswordValid = BCrypt.Net.BCrypt.Verify(credentials.Password, result.Value.PasswordHash);    
+    bool isPasswordValid = _passwordVerifier.Verify(credentials.Password, result.Value.PasswordHash);    
 
     if (isPasswordValid == false)
     {

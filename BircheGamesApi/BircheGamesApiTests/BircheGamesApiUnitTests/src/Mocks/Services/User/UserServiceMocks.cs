@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BircheGamesApi;
@@ -18,7 +19,7 @@ public class UserServiceMock : BasicMock, IUserService
   public Task<Result<UserEntity>> GetUserByEmailAddress(string emailAddress)
   {
     MethodCalls.Add(new() { MethodName = "GetUserByEmailAddress", Arguments = new[]{ emailAddress } });
-    MethodResponse response = MethodResponses["GetUserByEmailAddress"];
+    MethodResponse response = GetMethodResponse("GetUserByEmailAddress");
 
     if (response == MethodResponse.THROW)
     {
@@ -46,5 +47,30 @@ public class UserServiceMock : BasicMock, IUserService
   public Task<Result> RegisterUser(RegisterUserRequest request)
   {
     throw new System.NotImplementedException();
+  }
+
+  public Task<Result> ValidateUserEmail(string id)
+  {
+    MethodCalls.Add(new(){ MethodName = "ValidateUserEmail", Arguments = new[]{ id } });
+    MethodResponse response = GetMethodResponse("ValidateUserEmail");
+    switch (response)
+    {
+      case MethodResponse.THROW:
+        throw new IntentionalException();
+      case MethodResponse.FAILURE:
+        return Task.FromResult(
+          new ResultBuilder()
+            .Fail()
+            .Build()
+        );
+      case MethodResponse.SUCCESS:
+        return Task.FromResult(
+          new ResultBuilder()
+            .Succeed()
+            .Build()
+        );
+      default:
+        throw new NotImplementedException();
+    }
   }
 }

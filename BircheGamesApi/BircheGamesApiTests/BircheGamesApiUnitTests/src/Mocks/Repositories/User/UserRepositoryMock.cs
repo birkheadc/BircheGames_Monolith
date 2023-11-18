@@ -4,80 +4,170 @@ using System.Threading.Tasks;
 using BircheGamesApi;
 using BircheGamesApi.Models;
 using BircheGamesApi.Repositories;
+using BircheGamesApiUnitTests.Mocks.Exceptions;
 using Newtonsoft.Json;
 
 namespace BircheGamesApiUnitTests.Mocks.Repositories;
 
-public class UserRepositoryMock : IUserRepository
+public class UserRepositoryMock : BasicMock, IUserRepository
 {
-  public Result CreateUserResult = new();
-  public Result DeleteUserResult = new();
-  public Result<UserEntity> GetUserByDisplayNameAndTagResult = new();
-  public Result<UserEntity> GetUserByIdResult = new();
-  public Result<UserEntity> GetUserByEmailAddressResult = new();
-  public Result UpdateUserResult = new();
-
-  public readonly List<MethodCall> MethodCalls = new();
 
   public Task<Result> CreateUser(UserEntity user)
   {
     MethodCalls.Add(new(){ MethodName = "CreateUser", Arguments = new[]{JsonConvert.SerializeObject(user)}});
-    return Task.FromResult(CreateUserResult);
+    
+    MethodResponse response = GetMethodResponse("CreateUser");
+    switch (response)
+    {
+      case MethodResponse.THROW:
+        throw new IntentionalException();
+      case MethodResponse.FAILURE:
+        return Task.FromResult(
+          new ResultBuilder()
+            .Fail()
+            .Build()
+        );
+      case MethodResponse.SUCCESS:
+        return Task.FromResult(
+          new ResultBuilder()
+            .Succeed()
+            .Build()
+        );
+      default:
+        throw new NotImplementedException();
+    }
   }
 
   public Task<Result> DeleteUser(string id)
   {
     MethodCalls.Add(new(){ MethodName = "DeleteUser", Arguments = new[]{id}});
-    return Task.FromResult(DeleteUserResult);
+
+    MethodResponse response = GetMethodResponse("DeleteUser");
+    switch (response)
+    {
+      case MethodResponse.THROW:
+        throw new IntentionalException();
+      case MethodResponse.FAILURE:
+        return Task.FromResult(
+          new ResultBuilder()
+            .Fail()
+            .Build()
+        );
+      case MethodResponse.SUCCESS:
+        return Task.FromResult(
+          new ResultBuilder()
+            .Succeed()
+            .Build()
+        );
+      default:
+        throw new NotImplementedException();
+    }
   }
 
   public Task<Result<UserEntity>> GetUserByDisplayNameAndTag(string displayName, string tag)
   {
     MethodCalls.Add(new(){ MethodName = "GetUserByDisplayNameAndTag", Arguments = new[]{ displayName, tag }});
-    if (GetUserByDisplayNameAndTagResult.WasSuccess)
+
+    MethodResponse response = GetMethodResponse("GetUserByDisplayNameAndTag");
+    switch (response)
     {
-      if (GetUserByDisplayNameAndTagResult.Value is null)
-      {
-        GetUserByDisplayNameAndTagResult.Value = new();
-      }
-      GetUserByDisplayNameAndTagResult.Value.DisplayName = displayName;
-      GetUserByDisplayNameAndTagResult.Value.Tag = tag;
+      case MethodResponse.THROW:
+        throw new IntentionalException();
+      case MethodResponse.FAILURE:
+        return Task.FromResult(
+          new ResultBuilder<UserEntity>()
+            .Fail()
+            .Build()
+        );
+      case MethodResponse.SUCCESS:
+        return Task.FromResult(
+          new ResultBuilder<UserEntity>()
+            .Succeed()
+            .WithValue(new() { DisplayName = displayName, Tag = tag })
+            .Build()
+        );
+      default:
+        throw new NotImplementedException();
     }
-    
-    return Task.FromResult(GetUserByDisplayNameAndTagResult);
   }
 
   public Task<Result<UserEntity>> GetUserById(string id)
   {
     MethodCalls.Add(new(){ MethodName = "GetUserById", Arguments = new[]{id}});
-    if (GetUserByIdResult.WasSuccess)
+
+    MethodResponse response = GetMethodResponse("GetUserById");
+    switch (response)
     {
-      if (GetUserByIdResult.Value is null)
-      {
-        GetUserByIdResult.Value = new();
-      }
-      GetUserByIdResult.Value.Id = id;
+      case MethodResponse.THROW:
+        throw new IntentionalException();
+      case MethodResponse.FAILURE:
+        return Task.FromResult(
+          new ResultBuilder<UserEntity>()
+            .Fail()
+            .Build()
+        );
+      case MethodResponse.SUCCESS:
+        return Task.FromResult(
+          new ResultBuilder<UserEntity>()
+            .Succeed()
+            .WithValue(new() { Id = id })
+            .Build()
+        );
+      default:
+        throw new NotImplementedException();
     }
-    return Task.FromResult(GetUserByIdResult);
   }
 
   public Task<Result<UserEntity>> GetUserByEmailAddress(string emailAddress)
   {
     MethodCalls.Add(new(){ MethodName = "GetUserByEmailAddress", Arguments = new[]{emailAddress}});
-    if (GetUserByEmailAddressResult.WasSuccess)
+
+    MethodResponse response = GetMethodResponse("GetUserByEmailAddress");
+    switch (response)
     {
-      if (GetUserByEmailAddressResult.Value is null)
-      {
-        GetUserByEmailAddressResult.Value = new();
-      }
-      GetUserByEmailAddressResult.Value.EmailAddress = emailAddress;
+      case MethodResponse.THROW:
+        throw new IntentionalException();
+      case MethodResponse.FAILURE:
+        return Task.FromResult(
+          new ResultBuilder<UserEntity>()
+            .Fail()
+            .Build()
+        );
+      case MethodResponse.SUCCESS:
+        return Task.FromResult(
+          new ResultBuilder<UserEntity>()
+            .Succeed()
+            .WithValue(new() { EmailAddress = emailAddress })
+            .Build()
+        );
+      default:
+        throw new NotImplementedException();
     }
-    return Task.FromResult(GetUserByEmailAddressResult);
   }
 
   public Task<Result> UpdateUser(UserEntity user)
   {
     MethodCalls.Add(new(){ MethodName = "UpdateUser", Arguments = new[]{JsonConvert.SerializeObject(user)}});
-    return Task.FromResult(UpdateUserResult);
+
+    MethodResponse response = GetMethodResponse("UpdateUser");
+    switch (response)
+    {
+      case MethodResponse.THROW:
+        throw new IntentionalException();
+      case MethodResponse.FAILURE:
+        return Task.FromResult(
+          new ResultBuilder()
+            .Fail()
+            .Build()
+        );
+      case MethodResponse.SUCCESS:
+        return Task.FromResult(
+          new ResultBuilder()
+            .Succeed()
+            .Build()
+        );
+      default:
+        throw new NotImplementedException();
+    }
   }
 }

@@ -14,8 +14,8 @@ public class EmailServiceMock : BasicMock, IEmailService
   public Task<Result> SendEmail(string from, IEnumerable<string> to, Message message)
   {
     MethodCalls.Add(new(){ MethodName = "SendEmail", Arguments = new[]{"from", JsonConvert.SerializeObject(to), JsonConvert.SerializeObject(message)} } );
-
-    MethodResponse response = MethodResponses["SendEmail"];
+    
+    MethodResponse response = GetMethodResponse("SendEmail");
 
     switch (response)
     {

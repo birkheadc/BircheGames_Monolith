@@ -80,8 +80,18 @@ public class EmailVerificationService : IEmailVerificationService
     return message;
   }
 
-  public Task<Result> VerifyEmail(VerifyEmailRequest request)
+  public async Task<Result> VerifyEmail(VerifyEmailRequest request)
   {
-    throw new NotImplementedException();
+    string? userId = _securityTokenValidator.GetTokenUserId(request.VerificationCode);
+    if (userId is null)
+    {
+      return new ResultBuilder()
+        .Fail()
+        .WithGeneralError(401)
+        .Build();
+    }
+
+    Result result = await _userService.ValidateUserEmail(userId);
+    return result;
   }
 }

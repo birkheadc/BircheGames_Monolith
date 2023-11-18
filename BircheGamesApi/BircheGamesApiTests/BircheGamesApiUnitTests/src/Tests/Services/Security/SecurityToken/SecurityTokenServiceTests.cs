@@ -1,8 +1,10 @@
 using System.Threading.Tasks;
 using BircheGamesApi;
 using BircheGamesApi.Services;
+using BircheGamesApiUnitTests.Mocks;
 using BircheGamesApiUnitTests.Mocks.Config;
 using BircheGamesApiUnitTests.Mocks.Repositories;
+using BircheGamesApiUnitTests.Mocks.Services;
 using Xunit;
 
 namespace BircheGamesApiUnitTests.Tests.Services;
@@ -12,15 +14,15 @@ public class SecurityTokenServiceTests
   [Fact]
   public async Task AuthenticateUser_Fails_WhenUserWithEmailAddress_NotFound()
   {
-    UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
-      .WithAllSuccessfulResult()
-      .WithGetUserByEmailAddressResult(new() { WasSuccess = false })
+    UserRepositoryMock userRepositoryMock = new BasicMockBuilder<UserRepositoryMock>()
+      .WithMethodResponse("GetUserByEmailAddress", MethodResponse.FAILURE)
       .Build();
 
     SecurityTokenService securityTokenService = new
     (
       userRepositoryMock,
-      new SecurityTokenGenerator(SecurityTokenConfig_Mocks.Default)
+      new SecurityTokenGenerator(SecurityTokenConfig_Mocks.Default),
+      new PasswordVerifierMock_ReturnsTrue()
     );
 
     Result result = await securityTokenService.AuthenticateUser(new());
@@ -30,41 +32,36 @@ public class SecurityTokenServiceTests
   [Fact]
   public async Task AuthenticateUser_Fails_WhenPassword_NotCorrect()
   {
-    string invalidPassword = "password";
-    string validPassword = "pa55w0rd";
-    string passwordHash = BCrypt.Net.BCrypt.HashPassword(validPassword);
-    UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
-      .WithAllSuccessfulResult()
-      .WithGetUserByEmailAddressResult(new() { WasSuccess = true, Value = new() { PasswordHash = passwordHash } })
+    UserRepositoryMock userRepositoryMock = new BasicMockBuilder<UserRepositoryMock>()
+      .WithMethodResponse("GetUserByEmailAddress", MethodResponse.SUCCESS)
       .Build();
 
     SecurityTokenService securityTokenService = new
     (
       userRepositoryMock,
-      new SecurityTokenGenerator(SecurityTokenConfig_Mocks.Default)
+      new SecurityTokenGenerator(SecurityTokenConfig_Mocks.Default),
+      new PasswordVerifierMock_ReturnsFalse()
     );
 
-    Result result = await securityTokenService.AuthenticateUser(new(){ EmailAddress = "test@email.com", Password = invalidPassword });
+    Result result = await securityTokenService.AuthenticateUser(new());
     Assert.False(result.WasSuccess);
   }
 
   [Fact]
   public async Task AuthenticateUser_ReturnsSecurityToken_WhenCredentialsValid()
   {
-    string validPassword = "pa55w0rd";
-    string passwordHash = BCrypt.Net.BCrypt.HashPassword(validPassword);
-    UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
-      .WithAllSuccessfulResult()
-      .WithGetUserByEmailAddressResult(new() { WasSuccess = true, Value = new() { PasswordHash = passwordHash } })
+    UserRepositoryMock userRepositoryMock = new BasicMockBuilder<UserRepositoryMock>()
+      .WithMethodResponse("GetUserByEmailAddress", MethodResponse.SUCCESS)
       .Build();
 
     SecurityTokenService securityTokenService = new
     (
       userRepositoryMock,
-      new SecurityTokenGenerator(SecurityTokenConfig_Mocks.Default)
+      new SecurityTokenGenerator(SecurityTokenConfig_Mocks.Default),
+      new PasswordVerifierMock_ReturnsTrue()
     );
 
-    Result result = await securityTokenService.AuthenticateUser(new(){ EmailAddress = "test@email.com", Password = validPassword });
+    Result result = await securityTokenService.AuthenticateUser(new());
     Assert.True(result.WasSuccess);
   }
 }

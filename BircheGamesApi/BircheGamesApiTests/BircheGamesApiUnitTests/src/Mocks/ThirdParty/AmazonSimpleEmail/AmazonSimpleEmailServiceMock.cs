@@ -291,7 +291,7 @@ public class AmazonSimpleEmailServiceMock : BasicMock, IAmazonSimpleEmailService
   {
     MethodCalls.Add(new(){ MethodName = "SendEmailAsync", Arguments = new[]{ JsonConvert.SerializeObject(request), JsonConvert.SerializeObject(cancellationToken) }});
 
-    MethodResponse response = MethodResponses["SendEmailAsync"];
+    MethodResponse response = GetMethodResponse("SendEmailAsync");
 
     if (response == MethodResponse.THROW)
     {

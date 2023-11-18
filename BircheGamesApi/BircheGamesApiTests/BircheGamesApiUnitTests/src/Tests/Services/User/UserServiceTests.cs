@@ -1,6 +1,8 @@
+using System;
 using System.Threading.Tasks;
 using BircheGamesApi;
 using BircheGamesApi.Services;
+using BircheGamesApiUnitTests.Mocks;
 using BircheGamesApiUnitTests.Mocks.Repositories;
 using BircheGamesApiUnitTests.Mocks.Validation;
 using Xunit;
@@ -14,9 +16,8 @@ public class UserServiceTests
   [Fact]
   public async Task RegisterUser_Fails_WhenValidatorFails()
   {
-    UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
-      .WithAllSuccessfulResult()
-      .WithGetUserByEmailAddressResult(new() { WasSuccess = false })
+    UserRepositoryMock userRepositoryMock = new BasicMockBuilder<UserRepositoryMock>()
+      .WithMethodResponse("GetUserByEmailAddress", MethodResponse.SUCCESS)
       .Build();
 
     UserService userService = new
@@ -34,9 +35,9 @@ public class UserServiceTests
   [Fact]
   public async Task RegisterUser_Succeeds_WhenValidatorSucceeds()
   {
-    UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
-      .WithAllSuccessfulResult()
-      .WithGetUserByEmailAddressResult(new() { WasSuccess = false })
+    UserRepositoryMock userRepositoryMock = new BasicMockBuilder<UserRepositoryMock>()
+      .WithMethodResponse("GetUserByEmailAddress", MethodResponse.FAILURE)
+      .WithMethodResponse("CreateUser", MethodResponse.SUCCESS)
       .Build();
       
     UserService userService = new
@@ -54,9 +55,8 @@ public class UserServiceTests
   [Fact]
   public async Task RegisterUser_Fails_WhenEmailAddress_NotUnique()
   {
-    UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
-      .WithAllSuccessfulResult()
-      .WithGetUserByEmailAddressResult(new(){ WasSuccess = true, Value = new() })
+    UserRepositoryMock userRepositoryMock = new BasicMockBuilder<UserRepositoryMock>()
+      .WithMethodResponse("GetUserByEmailAddress", MethodResponse.SUCCESS)
       .Build();
 
     UserService userService = new
@@ -78,8 +78,7 @@ public class UserServiceTests
   [Fact]
   public async Task PatchUserDisplayNameAndTag_Fails_WhenValidatorFails()
   {
-    UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
-      .WithAllSuccessfulResult()
+    UserRepositoryMock userRepositoryMock = new BasicMockBuilder<UserRepositoryMock>()
       .Build();
       
     UserService userService = new
@@ -97,9 +96,10 @@ public class UserServiceTests
   [Fact]
   public async Task PatchUserDisplayNameAndTag_Succeeds_WhenValidatorSucceeds()
   {
-    UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
-      .WithAllSuccessfulResult()
-      .WithGetUserByDisplayNameAndTagResult(new(){ WasSuccess = false })
+    UserRepositoryMock userRepositoryMock = new BasicMockBuilder<UserRepositoryMock>()
+      .WithMethodResponse("GetUserByDisplayNameAndTag", MethodResponse.FAILURE)
+      .WithMethodResponse("GetUserById", MethodResponse.SUCCESS)
+      .WithMethodResponse("UpdateUser", MethodResponse.SUCCESS)
       .Build();
       
     UserService userService = new
@@ -117,9 +117,9 @@ public class UserServiceTests
   [Fact]
   public async Task PatchUserDisplayNameAndTag_Fails_WhenNotUnique()
   {
-    UserRepositoryMock userRepositoryMock = new UserRepositoryMockBuilder()
-      .WithAllSuccessfulResult()
-      .WithGetUserByDisplayNameAndTagResult(new(){ WasSuccess = true, Value = new() })
+    UserRepositoryMock userRepositoryMock = new BasicMockBuilder<UserRepositoryMock>()
+      .WithMethodResponse("GetUserByDisplayNameAndTag", MethodResponse.SUCCESS)
+      .WithMethodResponse("GetUserById", MethodResponse.SUCCESS)
       .Build();
       
     UserService userService = new
@@ -135,4 +135,14 @@ public class UserServiceTests
   }
 
   #endregion PatchUserDisplayNameAndTag
+
+  #region ValidateUserEmail
+
+  [Fact]
+  public async Task ValidateUserEmail_Fails_WhenUserNotFound()
+  {
+    
+  }
+
+  #endregion ValidateUserEmail
 }

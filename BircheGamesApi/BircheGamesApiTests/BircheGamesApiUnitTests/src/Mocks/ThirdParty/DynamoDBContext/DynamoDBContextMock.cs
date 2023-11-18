@@ -150,7 +150,7 @@ public class DynamoDBContextMock : BasicMock, IDynamoDBContext
 
   public Task<T> LoadAsync<T>(object hashKey, CancellationToken cancellationToken = default)
   {
-    MethodResponse response = MethodResponses["LoadAsync"];
+    MethodResponse response = GetMethodResponse("LoadAsync");
     switch (response)
     {
       case MethodResponse.THROW:
@@ -211,7 +211,7 @@ public class DynamoDBContextMock : BasicMock, IDynamoDBContext
 
   public AsyncSearch<T> QueryAsync<T>(object hashKeyValue, DynamoDBOperationConfig operationConfig = null)
   {
-    MethodResponse response = MethodResponses["QueryAsync"];
+    MethodResponse response = GetMethodResponse("QueryAsync");
     switch (response)
     {
       case MethodResponse.THROW:
@@ -236,7 +236,7 @@ public class DynamoDBContextMock : BasicMock, IDynamoDBContext
 
   public AsyncSearch<T> QueryAsync<T>(object hashKeyValue, QueryOperator op, IEnumerable<object> values, DynamoDBOperationConfig operationConfig = null)
   {
-    MethodResponse response = MethodResponses["QueryAsync"];
+    MethodResponse response = GetMethodResponse("QueryAsync");
     switch (response)
     {
       case MethodResponse.THROW:

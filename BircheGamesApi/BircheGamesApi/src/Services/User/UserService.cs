@@ -117,4 +117,20 @@ public class UserService : IUserService
   {
     return _userRepository.GetUserByEmailAddress(emailAddress);
   }
+
+  public async Task<Result> ValidateUserEmail(string id)
+  {
+    Result<UserEntity> result = await _userRepository.GetUserById(id);
+    if (result.WasSuccess == false || result.Value is null)
+    {
+      return new ResultBuilder()
+        .Fail()
+        .WithGeneralError(404)
+        .Build();
+    }
+    UserEntity user = result.Value;
+    user.IsEmailVerified = true;
+    
+    return await _userRepository.UpdateUser(user);
+  }
 }
