@@ -62,6 +62,13 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
     Assert.Contains(result.Errors, e => e.StatusCode == 500);
   }
 
+  [Fact]
+  public async Task CreateUser_Calls_SaveAsync_WhenSucceeds()
+  {
+    // Todo
+    Assert.True(false);
+  }
+
   #endregion CreateUser
 
   #region UpdateUser
