@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using BircheGamesApi;
 using BircheGamesApi.Models;
 using BircheGamesApi.Repositories;
+using BircheGamesApi.Results;
 using BircheGamesApiUnitTests.Mocks.Exceptions;
 using Newtonsoft.Json;
 
@@ -22,17 +21,9 @@ public class UserRepositoryMock : BasicMock, IUserRepository
       case MethodResponse.THROW:
         throw new IntentionalException();
       case MethodResponse.FAILURE:
-        return Task.FromResult(
-          new ResultBuilder()
-            .Fail()
-            .Build()
-        );
+        return Task.FromResult(Result.Fail());
       case MethodResponse.SUCCESS:
-        return Task.FromResult(
-          new ResultBuilder()
-            .Succeed()
-            .Build()
-        );
+        return Task.FromResult(Result.Succeed());
       default:
         throw new NotImplementedException();
     }
@@ -48,17 +39,9 @@ public class UserRepositoryMock : BasicMock, IUserRepository
       case MethodResponse.THROW:
         throw new IntentionalException();
       case MethodResponse.FAILURE:
-        return Task.FromResult(
-          new ResultBuilder()
-            .Fail()
-            .Build()
-        );
+        return Task.FromResult(Result.Fail());
       case MethodResponse.SUCCESS:
-        return Task.FromResult(
-          new ResultBuilder()
-            .Succeed()
-            .Build()
-        );
+        return Task.FromResult(Result.Succeed());
       default:
         throw new NotImplementedException();
     }
@@ -74,18 +57,9 @@ public class UserRepositoryMock : BasicMock, IUserRepository
       case MethodResponse.THROW:
         throw new IntentionalException();
       case MethodResponse.FAILURE:
-        return Task.FromResult(
-          new ResultBuilder<UserEntity>()
-            .Fail()
-            .Build()
-        );
+        return Task.FromResult(Result<UserEntity>.Fail());
       case MethodResponse.SUCCESS:
-        return Task.FromResult(
-          new ResultBuilder<UserEntity>()
-            .Succeed()
-            .WithValue(new() { DisplayName = displayName, Tag = tag })
-            .Build()
-        );
+        return Task.FromResult(Result<UserEntity>.Succeed().WithValue(new() { DisplayName = displayName, Tag = tag }));
       default:
         throw new NotImplementedException();
     }
@@ -101,18 +75,9 @@ public class UserRepositoryMock : BasicMock, IUserRepository
       case MethodResponse.THROW:
         throw new IntentionalException();
       case MethodResponse.FAILURE:
-        return Task.FromResult(
-          new ResultBuilder<UserEntity>()
-            .Fail()
-            .Build()
-        );
+        return Task.FromResult(Result<UserEntity>.Fail());
       case MethodResponse.SUCCESS:
-        return Task.FromResult(
-          new ResultBuilder<UserEntity>()
-            .Succeed()
-            .WithValue(new() { Id = id })
-            .Build()
-        );
+        return Task.FromResult(Result<UserEntity>.Succeed().WithValue(new() { Id = id }));
       default:
         throw new NotImplementedException();
     }
@@ -128,18 +93,9 @@ public class UserRepositoryMock : BasicMock, IUserRepository
       case MethodResponse.THROW:
         throw new IntentionalException();
       case MethodResponse.FAILURE:
-        return Task.FromResult(
-          new ResultBuilder<UserEntity>()
-            .Fail()
-            .Build()
-        );
+        return Task.FromResult(Result<UserEntity>.Fail());
       case MethodResponse.SUCCESS:
-        return Task.FromResult(
-          new ResultBuilder<UserEntity>()
-            .Succeed()
-            .WithValue(new() { EmailAddress = emailAddress })
-            .Build()
-        );
+        return Task.FromResult(Result<UserEntity>.Succeed().WithValue(new() { EmailAddress = emailAddress }));
       default:
         throw new NotImplementedException();
     }
@@ -155,17 +111,9 @@ public class UserRepositoryMock : BasicMock, IUserRepository
       case MethodResponse.THROW:
         throw new IntentionalException();
       case MethodResponse.FAILURE:
-        return Task.FromResult(
-          new ResultBuilder()
-            .Fail()
-            .Build()
-        );
+        return Task.FromResult(Result.Fail());
       case MethodResponse.SUCCESS:
-        return Task.FromResult(
-          new ResultBuilder()
-            .Succeed()
-            .Build()
-        );
+        return Task.FromResult(Result.Succeed());
       default:
         throw new NotImplementedException();
     }

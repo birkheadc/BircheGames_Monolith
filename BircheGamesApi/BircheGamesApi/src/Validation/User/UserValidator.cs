@@ -1,6 +1,8 @@
+using System.Net;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
 using BircheGamesApi.Config;
+using BircheGamesApi.Results;
 
 namespace BircheGamesApi.Validation;
 
@@ -28,7 +30,7 @@ public class UserValidator : IUserValidator
   {
     if (emailAddress.Contains(' '))
     {
-      _errors.Add(new(){ Field = "EmailAddress", StatusCode = 422, Message = "Email Address cannot contain spaces." });
+      _errors.Add(new(){ Field = "EmailAddress", StatusCode = HttpStatusCode.UnprocessableEntity, Message = "Email Address cannot contain spaces." });
     }
     try
     {
@@ -36,7 +38,7 @@ public class UserValidator : IUserValidator
     }
     catch
     {
-      _errors.Add(new(){ Field = "EmailAddress", StatusCode = 422, Message = "Email Address format is invalid." });
+      _errors.Add(new(){ Field = "EmailAddress", StatusCode = HttpStatusCode.UnprocessableEntity, Message = "Email Address format is invalid." });
     }
     return this;
   }
@@ -48,7 +50,7 @@ public class UserValidator : IUserValidator
       _errors.Add(new ResultError()
       {
         Field = "DisplayName",
-        StatusCode = 422,
+        StatusCode = HttpStatusCode.UnprocessableEntity,
         Message = "Display name is too short."
       });
     }
@@ -58,7 +60,7 @@ public class UserValidator : IUserValidator
       _errors.Add(new ResultError()
       {
         Field = "DisplayName",
-        StatusCode = 422,
+        StatusCode = HttpStatusCode.UnprocessableEntity,
         Message = "Display name is too long."
       });
     }
@@ -70,7 +72,7 @@ public class UserValidator : IUserValidator
       _errors.Add(new ResultError()
       {
         Field = "DisplayName",
-        StatusCode = 422,
+        StatusCode = HttpStatusCode.UnprocessableEntity,
         Message = "Display name contains invalid characters. Must begin with a letter; and contain only letters, numbers, and underscores."
       });
     }
@@ -85,7 +87,7 @@ public class UserValidator : IUserValidator
       _errors.Add(new ResultError()
       {
         Field = "Tag",
-        StatusCode = 422,
+        StatusCode = HttpStatusCode.UnprocessableEntity,
         Message = "Tag must be exactly 6 characters."
       });
     }
@@ -97,7 +99,7 @@ public class UserValidator : IUserValidator
       _errors.Add(new ResultError()
       {
         Field = "Tag",
-        StatusCode = 422,
+        StatusCode = HttpStatusCode.UnprocessableEntity,
         Message = "Tag contains invalid characters. Must contain only letters and numbers."
       });
     }
@@ -112,7 +114,7 @@ public class UserValidator : IUserValidator
       _errors.Add(new ResultError()
       {
         Field = "Password",
-        StatusCode = 422,
+        StatusCode = HttpStatusCode.UnprocessableEntity,
         Message = "Password is too short."
       });
     }
@@ -122,7 +124,7 @@ public class UserValidator : IUserValidator
       _errors.Add(new ResultError()
       {
         Field = "Password",
-        StatusCode = 422,
+        StatusCode = HttpStatusCode.UnprocessableEntity,
         Message = "Password is too long."
       });
     }

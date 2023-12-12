@@ -1,4 +1,5 @@
 using BircheGamesApi;
+using BircheGamesApi.Results;
 using BircheGamesApi.Validation;
 
 namespace BircheGamesApiUnitTests.Mocks.Validation;
@@ -7,10 +8,7 @@ public class UserValidator_Mocks_ReturnsInvalid : IUserValidator
 {
   public Result Validate()
   {
-    return new Result()
-    {
-      WasSuccess = false
-    };
+    return Result.Fail();
   }
 
   public IUserValidator WithDisplayName(string displayName)
@@ -38,10 +36,7 @@ public class UserValidator_Mocks_ReturnsValid : IUserValidator
 {
   public Result Validate()
   {
-    return new Result()
-    {
-      WasSuccess = true
-    };
+    return Result.Succeed();
   }
 
   public IUserValidator WithDisplayName(string displayName)

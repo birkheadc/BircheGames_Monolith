@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using BircheGamesApi;
 using BircheGamesApi.Models;
 using BircheGamesApi.Requests;
+using BircheGamesApi.Results;
 using BircheGamesApi.Services;
 using BircheGamesApiUnitTests.Mocks.Exceptions;
 
@@ -28,15 +29,10 @@ public class UserServiceMock : BasicMock, IUserService
 
     if (response == MethodResponse.FAILURE)
     {
-      return Task.FromResult(new ResultBuilder<UserEntity>()
-        .Fail()
-        .Build());
+      return Task.FromResult(Result<UserEntity>.Fail());
     }
 
-    return Task.FromResult(new ResultBuilder<UserEntity>()
-        .Succeed()
-        .WithValue(new())
-        .Build());
+    return Task.FromResult(Result<UserEntity>.Succeed().WithValue(new()));
   }
 
   public Task<Result> PatchUserDisplayNameAndTag(string id, ChangeDisplayNameAndTagRequest request)
@@ -58,17 +54,9 @@ public class UserServiceMock : BasicMock, IUserService
       case MethodResponse.THROW:
         throw new IntentionalException();
       case MethodResponse.FAILURE:
-        return Task.FromResult(
-          new ResultBuilder()
-            .Fail()
-            .Build()
-        );
+        return Task.FromResult(Result.Fail());
       case MethodResponse.SUCCESS:
-        return Task.FromResult(
-          new ResultBuilder()
-            .Succeed()
-            .Build()
-        );
+        return Task.FromResult(Result.Succeed());
       default:
         throw new NotImplementedException();
     }

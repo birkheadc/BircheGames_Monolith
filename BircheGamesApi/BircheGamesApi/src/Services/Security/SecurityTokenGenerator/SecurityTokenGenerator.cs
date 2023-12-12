@@ -22,10 +22,7 @@ public class SecurityTokenGenerator : ISecurityTokenGenerator
   public SecurityTokenWrapper GenerateTokenForUser(UserEntity user)
   {
     SecurityToken token = _handler.CreateToken(GetSecurityTokenDescriptor(user));
-    return new()
-    {
-      Token = _handler.WriteToken(token)
-    };
+    return new() { Token = _handler.WriteToken(token) };
   }
 
   private SecurityTokenDescriptor GetSecurityTokenDescriptor(UserEntity user)

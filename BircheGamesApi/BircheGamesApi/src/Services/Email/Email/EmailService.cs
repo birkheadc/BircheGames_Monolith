@@ -1,5 +1,7 @@
+using System.Net;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
+using BircheGamesApi.Results;
 using Microsoft.IdentityModel.Tokens;
 
 namespace BircheGamesApi.Services;
@@ -15,23 +17,9 @@ public class EmailService : IEmailService
 
   public async Task<Result> SendEmail(string from, IEnumerable<string> to, Message message)
   {
-    ResultBuilder resultBuilder = new();
+    if (from.IsNullOrEmpty()) return Result.Fail().WithGeneralError(HttpStatusCode.UnprocessableEntity, "'From' field cannot be empty.");
 
-    if (from.IsNullOrEmpty())
-    {
-      return resultBuilder
-        .Fail()
-        .WithGeneralError(422, "'From' field cannot be empty.")
-        .Build();
-    }
-
-    if (to.IsNullOrEmpty())
-    {
-      return resultBuilder
-        .Fail()
-        .WithGeneralError(422, "'To' field cannot be empty.")
-        .Build();
-    }
+    if (to.IsNullOrEmpty()) return Result.Fail().WithGeneralError(HttpStatusCode.UnprocessableEntity, "'To' field cannot be empty.");
 
     Destination destination = new()
     {
@@ -49,24 +37,13 @@ public class EmailService : IEmailService
     {
       SendEmailResponse response = await _amazonSimpleEmailService.SendEmailAsync(request);
 
-      if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
-      {
-        return resultBuilder
-          .Succeed()
-          .Build();
-      }
-      return resultBuilder
-        .Fail()
-        .WithGeneralError((int)response.HttpStatusCode)
-        .Build();
+      if (response.HttpStatusCode != HttpStatusCode.OK) return Result.Fail().WithGeneralError(response.HttpStatusCode);
+      return Result.Succeed();
     }
     catch (Exception ex)
     {
       Console.WriteLine($"Exception encountered when attempting to Send Email Async: {ex.Message}");
-      return resultBuilder
-        .Fail()
-        .WithGeneralError(500, "Error when attempting to connect to AWS service.")
-        .Build();
+      return Result.Fail().WithGeneralError(HttpStatusCode.InternalServerError, "Error when attempting to connect to AWS service.");
     }
   }
 }

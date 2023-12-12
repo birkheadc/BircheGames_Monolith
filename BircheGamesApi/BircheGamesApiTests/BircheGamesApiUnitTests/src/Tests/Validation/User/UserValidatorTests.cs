@@ -1,4 +1,5 @@
 using BircheGamesApi;
+using BircheGamesApi.Results;
 using BircheGamesApi.Validation;
 using BircheGamesApiUnitTests.Mocks.Config;
 using Xunit;

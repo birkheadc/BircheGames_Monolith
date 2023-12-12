@@ -1,3 +1,5 @@
+using BircheGamesApi.Results;
+
 namespace BircheGamesApi.Validation;
 
 public interface IUserValidator
