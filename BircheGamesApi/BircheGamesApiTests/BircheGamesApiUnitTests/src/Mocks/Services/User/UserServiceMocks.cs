@@ -19,7 +19,7 @@ public class UserServiceMock : BasicMock, IUserService
 
   public Task<Result<UserEntity>> GetUserByEmailAddress(string emailAddress)
   {
-    MethodCalls.Add(new() { MethodName = "GetUserByEmailAddress", Arguments = new[]{ emailAddress } });
+    AddMethodCall("GetUserByEmailAddress", emailAddress);
     MethodResponse response = GetMethodResponse("GetUserByEmailAddress");
 
     if (response == MethodResponse.THROW)
@@ -47,7 +47,7 @@ public class UserServiceMock : BasicMock, IUserService
 
   public Task<Result> ValidateUserEmail(string id)
   {
-    MethodCalls.Add(new(){ MethodName = "ValidateUserEmail", Arguments = new[]{ id } });
+    AddMethodCall("ValidateUserEmail", id);
     MethodResponse response = GetMethodResponse("ValidateUserEmail");
     switch (response)
     {

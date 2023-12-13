@@ -263,7 +263,7 @@ public class DynamoDBContextMock : BasicMock, IDynamoDBContext
 
   public Task SaveAsync<T>(T value, CancellationToken cancellationToken = default)
   {
-    MethodCalls.Add(new(){  MethodName = "SaveAsync", Arguments = new[]{JsonConvert.SerializeObject(value)}});
+    AddMethodCall("SaveAsync", value);
     return Task.CompletedTask;
   }
 

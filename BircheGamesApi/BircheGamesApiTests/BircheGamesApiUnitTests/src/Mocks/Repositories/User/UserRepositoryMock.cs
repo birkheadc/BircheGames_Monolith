@@ -13,8 +13,7 @@ public class UserRepositoryMock : BasicMock, IUserRepository
 
   public Task<Result> CreateUser(UserEntity user)
   {
-    // AddMethodCall("CreateUser", user);
-    MethodCalls.Add(new(){ MethodName = "CreateUser", Arguments = new[]{JsonConvert.SerializeObject(user)}});
+    AddMethodCall("CreateUser", user);
     
     MethodResponse response = GetMethodResponse("CreateUser");
     switch (response)
@@ -32,7 +31,7 @@ public class UserRepositoryMock : BasicMock, IUserRepository
 
   public Task<Result> DeleteUser(string id)
   {
-    MethodCalls.Add(new(){ MethodName = "DeleteUser", Arguments = new[]{id}});
+    AddMethodCall("DeleteUser", id);
 
     MethodResponse response = GetMethodResponse("DeleteUser");
     switch (response)
@@ -50,7 +49,7 @@ public class UserRepositoryMock : BasicMock, IUserRepository
 
   public Task<Result<UserEntity>> GetUserByDisplayNameAndTag(string displayName, string tag)
   {
-    MethodCalls.Add(new(){ MethodName = "GetUserByDisplayNameAndTag", Arguments = new[]{ displayName, tag }});
+    AddMethodCall("GetUserByDisplayNameAndTag", displayName, tag);
 
     MethodResponse response = GetMethodResponse("GetUserByDisplayNameAndTag");
     switch (response)
@@ -68,7 +67,7 @@ public class UserRepositoryMock : BasicMock, IUserRepository
 
   public Task<Result<UserEntity>> GetUserById(string id)
   {
-    MethodCalls.Add(new(){ MethodName = "GetUserById", Arguments = new[]{id}});
+    AddMethodCall("GetUserById", id);
 
     MethodResponse response = GetMethodResponse("GetUserById");
     switch (response)
@@ -86,7 +85,7 @@ public class UserRepositoryMock : BasicMock, IUserRepository
 
   public Task<Result<UserEntity>> GetUserByEmailAddress(string emailAddress)
   {
-    MethodCalls.Add(new(){ MethodName = "GetUserByEmailAddress", Arguments = new[]{emailAddress}});
+    AddMethodCall("GetUserByEmailAddress", emailAddress);
 
     MethodResponse response = GetMethodResponse("GetUserByEmailAddress");
     switch (response)
@@ -104,7 +103,7 @@ public class UserRepositoryMock : BasicMock, IUserRepository
 
   public Task<Result> UpdateUser(UserEntity user)
   {
-    MethodCalls.Add(new(){ MethodName = "UpdateUser", Arguments = new[]{JsonConvert.SerializeObject(user)}});
+    AddMethodCall("UpdateUser", user);
 
     MethodResponse response = GetMethodResponse("UpdateUser");
     switch (response)

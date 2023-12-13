@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using BircheGamesApiUnitTests.Mocks.Exceptions;
 using Newtonsoft.Json;
@@ -17,13 +18,12 @@ public abstract class BasicMock
     return MethodResponses[methodName];
   }
 
-  internal void AddMethodCall(string methodName, object? arguments = null)
+  internal void AddMethodCall(string methodName, params object?[]? arguments)
   {
-    MethodCall methodCall = new()
+    MethodCalls.Add(new()
     {
       MethodName = methodName,
-      Arguments = new[]{JsonConvert.SerializeObject(arguments)}
-    };
-    MethodCalls.Add(methodCall);
+      Arguments = arguments ?? Array.Empty<object>()
+    });
   }
 }
