@@ -1,8 +1,5 @@
-using System;
 using System.Net;
 using System.Threading.Tasks;
-using Amazon.DynamoDBv2.DataModel;
-using BircheGamesApi;
 using BircheGamesApi.Models;
 using BircheGamesApi.Repositories;
 using BircheGamesApi.Results;
