@@ -68,7 +68,16 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   [Fact]
   public async Task CreateUser_Calls_SaveAsync_WhenSucceeds()
   {
-    // Todo
+    DynamoDBContextMock dBContext = new BasicMockBuilder<DynamoDBContextMock>()
+      .WithMethodResponse("LoadAsync", MethodResponse.FAILURE)
+      .Build();
+    
+    UserRepository userRepository = new(dBContext);
+
+    Result result = await userRepository.CreateUser(new());
+
+    Assert.True(result.WasSuccess);
+    Assert.Contains(dBContext.MethodCalls, m => m.MethodName == "SaveAsync");
   }
 
   #endregion CreateUser
@@ -210,4 +219,38 @@ namespace BircheGamesApiUnitTests.Tests.Repositories;
   }
 
   #endregion GetUserByEmailAddress
+
+  #region DeleteUser
+
+  [Fact]
+  public async Task DeleteUser_FailsGracefully_WhenContextThrows()
+  {
+    DynamoDBContextMock dBContext = new BasicMockBuilder<DynamoDBContextMock>()
+      .WithMethodResponse("DeleteAsync", MethodResponse.THROW)
+      .Build();
+
+    UserRepository userRepository = new(dBContext);
+
+    Result result = await userRepository.DeleteUser("");
+
+    Assert.False(result.WasSuccess);
+    Assert.Contains(dBContext.MethodCalls, m => m.MethodName == "DeleteAsync");
+  }
+
+  [Fact]
+  public async Task DeleteUser_CallsDeleteAsync()
+  {
+    DynamoDBContextMock dBContext = new BasicMockBuilder<DynamoDBContextMock>()
+      .WithMethodResponse("DeleteAsync", MethodResponse.SUCCESS)
+      .Build();
+
+    UserRepository userRepository = new(dBContext);
+
+    Result result = await userRepository.DeleteUser("");
+
+    Assert.True(result.WasSuccess);
+    Assert.Contains(dBContext.MethodCalls, m => m.MethodName == "DeleteAsync");
+  }
+
+  #endregion DeleteUser
  }

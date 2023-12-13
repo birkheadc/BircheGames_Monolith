@@ -60,7 +60,20 @@ public class DynamoDBContextMock : BasicMock, IDynamoDBContext
 
   public Task DeleteAsync<T>(T value, CancellationToken cancellationToken = default)
   {
-    throw new NotImplementedException();
+    AddMethodCall("DeleteAsync");
+    MethodResponse response = GetMethodResponse("DeleteAsync");
+    switch (response)
+    {
+      case MethodResponse.SUCCESS:
+        break;
+      case MethodResponse.FAILURE:
+        break;
+      case MethodResponse.THROW:
+        throw new IntentionalException();
+      default:
+        throw new NotImplementedException();
+    }
+    return Task.CompletedTask;
   }
 
   public Task DeleteAsync<T>(T value, DynamoDBOperationConfig operationConfig, CancellationToken cancellationToken = default)
@@ -166,22 +179,6 @@ public class DynamoDBContextMock : BasicMock, IDynamoDBContext
       default:
         throw new NotImplementedException();
     }
-    // if (LoadAsync_UserEntity_Result is null)
-    // {
-    //   throw new ArgumentNullException();
-    // }
-    // if (typeof(T) != typeof(UserEntity))
-    // {
-    //   throw new ArgumentException();
-    // }
-
-    // UserEntity? user = LoadAsync_UserEntity_Result.Result;
-    // if (user is null)
-    // {
-    //   return Task.FromResult((T)(object)null);
-    // }
-    // user.Id = hashKey.ToString() ?? "";
-    // return Task.FromResult((T)(object)user);
   }
 
   public Task<T> LoadAsync<T>(object hashKey, DynamoDBOperationConfig operationConfig, CancellationToken cancellationToken = default)

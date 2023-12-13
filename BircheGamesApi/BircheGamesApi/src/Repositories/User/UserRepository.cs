@@ -21,7 +21,6 @@ public class UserRepository : IUserRepository
     try
     {
       bool isIdUnique = await IsIdUnique(user.Id);
-
       if (isIdUnique == false) return Result.Fail().WithGeneralError(HttpStatusCode.Conflict);
 
       await _context.SaveAsync(user);
@@ -35,9 +34,17 @@ public class UserRepository : IUserRepository
     
   }
 
-  public Task<Result> DeleteUser(string id)
+  public async Task<Result> DeleteUser(string id)
   {
-    throw new NotImplementedException();
+    try
+    {
+      await _context.DeleteAsync(id);
+    }
+    catch
+    {
+      return Result.Fail().WithGeneralError(HttpStatusCode.InternalServerError, "Error when attempting to delete user.");
+    }
+    return Result.Succeed();
   }
 
   public async Task<Result<UserEntity>> GetUserByDisplayNameAndTag(string displayName, string tag)

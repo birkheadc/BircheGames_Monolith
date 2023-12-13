@@ -13,6 +13,7 @@ public class UserRepositoryMock : BasicMock, IUserRepository
 
   public Task<Result> CreateUser(UserEntity user)
   {
+    // AddMethodCall("CreateUser", user);
     MethodCalls.Add(new(){ MethodName = "CreateUser", Arguments = new[]{JsonConvert.SerializeObject(user)}});
     
     MethodResponse response = GetMethodResponse("CreateUser");
