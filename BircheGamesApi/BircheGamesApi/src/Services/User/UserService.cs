@@ -1,27 +1,30 @@
 using System.Net;
+using BircheGamesApi.Config;
 using BircheGamesApi.Models;
 using BircheGamesApi.Repositories;
 using BircheGamesApi.Requests;
 using BircheGamesApi.Results;
 using BircheGamesApi.Validation;
+using FluentValidation;
+using FluentValidation.Results;
 
 namespace BircheGamesApi.Services;
 
 public class UserService : IUserService
 {
-  private readonly IUserValidatorFactory _userValidatorFactory;
   private readonly IUserRepository _userRepository;
-
-  public UserService(IUserValidatorFactory userValidatorFactory, IUserRepository userRepository)
+  private readonly IMasterValidator _validator;
+  public UserService(IUserRepository userRepository, IMasterValidator validator)
   {
-    _userValidatorFactory = userValidatorFactory;
     _userRepository = userRepository;
+    _validator = validator;
   }
 
   public async Task<Result> PatchUserDisplayNameAndTag(string id, ChangeDisplayNameAndTagRequest request)
   {
-    Result validationResult = request.Validate(_userValidatorFactory.Create());
-    if (validationResult.WasSuccess == false) return validationResult;
+    // Todo Inject validator
+    ValidationResult validationResult = _validator.Validate(request);
+    if (validationResult.IsValid == false) return Result.Fail();
 
     Result<UserEntity> result = await _userRepository.GetUserById(id);
     if (result.WasSuccess == false || result.Value is null) return result;
@@ -48,8 +51,8 @@ public class UserService : IUserService
 
   public async Task<Result> RegisterUser(RegisterUserRequest request)
   {
-    Result validationResult = request.Validate(_userValidatorFactory.Create());
-    if (validationResult.WasSuccess == false) return validationResult;
+    ValidationResult validationResult = _validator.Validate(request);
+    if (validationResult.IsValid == false) return Result.Fail();
 
     bool isEmailAddressUnique = await IsEmailAddressUnique(request.EmailAddress);
     if (isEmailAddressUnique == false) return Result.Fail().WithGeneralError(HttpStatusCode.Conflict);

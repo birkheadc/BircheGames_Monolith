@@ -8,5 +8,6 @@
   - Test SecurityTokenGenerator against SecurityTokenValidator and program's authentication to make sure they are compatible
     - Also, is there a better way to AddAuthorization in program? Maybe tell it to use a specific class rather than just write the code in program.cs?
 
-  - Do something about validation, my current validation methods could probably use some abstraction.
-    - I know there are frameworks for validating incoming models, but I would also like to be able to arbitrarily validate any object from anywhere
+  - Write tests for MasterValidator
+    - When registered with a validator that fails, master validator should fail, and vice versa
+    - When attempting to validate an object which does not have a registered validator, throw exceptionq
