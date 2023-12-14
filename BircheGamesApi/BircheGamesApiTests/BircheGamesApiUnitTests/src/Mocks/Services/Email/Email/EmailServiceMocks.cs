@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.SimpleEmail.Model;
 using BircheGamesApi;
+using BircheGamesApi.Results;
 using BircheGamesApi.Services;
 using BircheGamesApiUnitTests.Mocks.Exceptions;
 using Newtonsoft.Json;
@@ -13,7 +14,7 @@ public class EmailServiceMock : BasicMock, IEmailService
 {
   public Task<Result> SendEmail(string from, IEnumerable<string> to, Message message)
   {
-    MethodCalls.Add(new(){ MethodName = "SendEmail", Arguments = new[]{"from", JsonConvert.SerializeObject(to), JsonConvert.SerializeObject(message)} } );
+    AddMethodCall("SendEmail", from, to, message);
     
     MethodResponse response = GetMethodResponse("SendEmail");
 
@@ -23,14 +24,10 @@ public class EmailServiceMock : BasicMock, IEmailService
         throw new IntentionalException();
 
       case MethodResponse.FAILURE:
-        return Task.FromResult(new ResultBuilder()
-          .Fail()
-          .Build());
+        return Task.FromResult(Result.Fail());
       
       case MethodResponse.SUCCESS:
-        return Task.FromResult(new ResultBuilder()
-          .Succeed()
-          .Build());
+        return Task.FromResult(Result.Succeed());
 
       default:
         throw new NotImplementedException();

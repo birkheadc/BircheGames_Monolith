@@ -4,6 +4,7 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using BircheGamesApi.Config;
 using BircheGamesApi.Repositories;
+using BircheGamesApi.Requests;
 using BircheGamesApi.Services;
 using BircheGamesApi.Validation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -40,8 +41,12 @@ config.GetSection("EmailVerificationConfig").Bind(emailVerificationConfig);
 emailVerificationConfig.SecurityTokenConfig.SecretKey = amazonSecrets.EmailVerificationSecretKey;
 services.AddSingleton(emailVerificationConfig);
 
+MasterValidatorBuilder masterValidatorBuilder = new();
+masterValidatorBuilder.Register<RegisterUserRequest, RegisterUserRequestValidator>();
+masterValidatorBuilder.Register<ChangeDisplayNameAndTagRequest, ChangeDisplayNameAndTagRequestValidator>();
+services.AddSingleton(masterValidatorBuilder.Build());
+
 services.AddScoped<IUserRepository, UserRepository>();
-services.AddTransient<IUserValidatorFactory, UserValidatorFactory>();
 services.AddScoped<IUserService, UserService>();
 
 services.AddTransient<JwtSecurityTokenHandler>();

@@ -34,16 +34,19 @@ public class UserEntity
     
   }
 
-  public UserEntity(RegisterUserRequest request)
+  public static UserEntity FromRegisterUserRequest(RegisterUserRequest request)
   {
-    Id = Guid.NewGuid().ToString();
-    EmailAddress = request.EmailAddress;
-    DisplayName = Guid.NewGuid().ToString();
-    Tag = "######";
-    CreationDateTime = DateTime.Now.ToString();
-    PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
-    Role = UserRole.USER;
-    IsEmailVerified = false;
-    IsDisplayNameChosen = false;
+    return new UserEntity()
+    {
+      Id = Guid.NewGuid().ToString(),
+      EmailAddress = request.EmailAddress,
+      DisplayName = Guid.NewGuid().ToString(),
+      Tag = "######",
+      CreationDateTime = DateTime.Now.ToString(),
+      PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+      Role = UserRole.USER,
+      IsEmailVerified = false,
+      IsDisplayNameChosen = false
+    };
   }
 }

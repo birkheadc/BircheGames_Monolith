@@ -1,7 +1,8 @@
-using System;
 using System.Threading.Tasks;
-using BircheGamesApi;
+using BircheGamesApi.Requests;
+using BircheGamesApi.Results;
 using BircheGamesApi.Services;
+using BircheGamesApi.Validation;
 using BircheGamesApiUnitTests.Mocks;
 using BircheGamesApiUnitTests.Mocks.Repositories;
 using BircheGamesApiUnitTests.Mocks.Validation;
@@ -22,8 +23,8 @@ public class UserServiceTests
 
     UserService userService = new
     (
-      new UserValidatorFactory_Mocks_ReturnsInvalid(),
-      userRepositoryMock
+      userRepositoryMock,
+      new MasterValidator_Mocks_ReturnsInvalid()
     );
 
     Result result = await userService.RegisterUser(new());
@@ -42,8 +43,8 @@ public class UserServiceTests
       
     UserService userService = new
     (
-      new UserValidatorFactory_Mocks_ReturnsValid(),
-      userRepositoryMock  
+      userRepositoryMock,
+      new MasterValidator_Mocks_ReturnsValid()
     );
 
     Result result = await userService.RegisterUser(new());
@@ -61,8 +62,8 @@ public class UserServiceTests
 
     UserService userService = new
     (
-      new UserValidatorFactory_Mocks_ReturnsValid(),
-      userRepositoryMock  
+      userRepositoryMock,
+      new MasterValidator_Mocks_ReturnsValid()
     );
 
     Result result = await userService.RegisterUser(new());
@@ -83,8 +84,8 @@ public class UserServiceTests
       
     UserService userService = new
     (
-      new UserValidatorFactory_Mocks_ReturnsInvalid(),
-      userRepositoryMock
+      userRepositoryMock,
+      new MasterValidator_Mocks_ReturnsInvalid()
     );
 
     Result result = await userService.PatchUserDisplayNameAndTag("", new());
@@ -104,8 +105,8 @@ public class UserServiceTests
       
     UserService userService = new
     (
-      new UserValidatorFactory_Mocks_ReturnsValid(),
-      userRepositoryMock
+      userRepositoryMock,
+      new MasterValidator_Mocks_ReturnsValid()
     );
 
     Result result = await userService.PatchUserDisplayNameAndTag("", new());
@@ -124,8 +125,8 @@ public class UserServiceTests
       
     UserService userService = new
     (
-      new UserValidatorFactory_Mocks_ReturnsValid(),
-      userRepositoryMock
+      userRepositoryMock,
+      new MasterValidator_Mocks_ReturnsValid()
     );
 
     Result result = await userService.PatchUserDisplayNameAndTag("", new());
@@ -147,8 +148,8 @@ public class UserServiceTests
 
     UserService userService = new
     (
-      new UserValidatorFactory_Mocks_ReturnsValid(),
-      userRepositoryMock
+      userRepositoryMock,
+      new MasterValidator_Mocks_ReturnsValid()
     );
 
     Result result = await userService.ValidateUserEmail("");
@@ -167,8 +168,8 @@ public class UserServiceTests
 
     UserService userService = new
     (
-      new UserValidatorFactory_Mocks_ReturnsValid(),
-      userRepositoryMock
+      userRepositoryMock,
+      new MasterValidator_Mocks_ReturnsValid()
     );
 
     Result result = await userService.ValidateUserEmail("");

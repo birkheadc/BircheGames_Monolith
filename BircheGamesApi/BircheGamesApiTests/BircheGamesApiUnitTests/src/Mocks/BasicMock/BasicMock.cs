@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using BircheGamesApiUnitTests.Mocks.Exceptions;
+using Newtonsoft.Json;
 
 namespace BircheGamesApiUnitTests.Mocks;
 
@@ -14,5 +16,14 @@ public abstract class BasicMock
       throw new MethodResponseNotSetException(methodName);
     }
     return MethodResponses[methodName];
+  }
+
+  internal void AddMethodCall(string methodName, params object?[]? arguments)
+  {
+    MethodCalls.Add(new()
+    {
+      MethodName = methodName,
+      Arguments = arguments ?? Array.Empty<object>()
+    });
   }
 }

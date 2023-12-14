@@ -1,4 +1,5 @@
 using BircheGamesApi.Models;
+using BircheGamesApi.Results;
 
 namespace BircheGamesApi.Repositories;
 

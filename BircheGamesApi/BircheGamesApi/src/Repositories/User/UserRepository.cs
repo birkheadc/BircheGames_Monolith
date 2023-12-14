@@ -1,6 +1,8 @@
+using System.Net;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
 using BircheGamesApi.Models;
+using BircheGamesApi.Results;
 using Microsoft.IdentityModel.Tokens;
 
 namespace BircheGamesApi.Repositories;
@@ -16,45 +18,37 @@ public class UserRepository : IUserRepository
 
   public async Task<Result> CreateUser(UserEntity user)
   {
-    ResultBuilder resultBuilder = new();
-
     try
     {
       bool isIdUnique = await IsIdUnique(user.Id);
-
-      if (isIdUnique == false)
-      {
-        return resultBuilder
-          .Fail()
-          .WithGeneralError(409)
-          .Build();
-      }
+      if (isIdUnique == false) return Result.Fail().WithGeneralError(HttpStatusCode.Conflict);
 
       await _context.SaveAsync(user);
-      return resultBuilder
-        .Succeed()
-        .Build();
+      return Result.Succeed();
     }
     catch (Exception ex)
     {
       Console.WriteLine($"Error while creating user: {ex.Message}");
-      return resultBuilder
-        .Fail()
-        .WithGeneralError(500, "An unexpected error occurred while connecting to the database.")
-        .Build();
+      return Result.Fail().WithGeneralError(HttpStatusCode.InternalServerError, "An unexpected error occurred while connecting to the database.");
     }
     
   }
 
-  public Task<Result> DeleteUser(string id)
+  public async Task<Result> DeleteUser(string id)
   {
-    throw new NotImplementedException();
+    try
+    {
+      await _context.DeleteAsync(id);
+    }
+    catch
+    {
+      return Result.Fail().WithGeneralError(HttpStatusCode.InternalServerError, "Error when attempting to delete user.");
+    }
+    return Result.Succeed();
   }
 
   public async Task<Result<UserEntity>> GetUserByDisplayNameAndTag(string displayName, string tag)
   {
-    ResultBuilder<UserEntity> resultBuilder = new();
-
     DynamoDBOperationConfig config = new()
     {
       IndexName = "DisplayName-Tag-index"
@@ -64,32 +58,20 @@ public class UserRepository : IUserRepository
     {
       AsyncSearch<UserEntity> asyncSearch = _context.QueryAsync<UserEntity>(displayName, QueryOperator.Equal, new List<object>(){ tag }, config);
       List<UserEntity> users = await asyncSearch.GetRemainingAsync();
-      if (users.IsNullOrEmpty())
-      {
-        return resultBuilder
-          .Fail()
-          .WithGeneralError(404)
-          .Build();
-      }
-      return resultBuilder
-        .Succeed()
-        .WithValue(users[0])
-        .Build();
+
+      if (users.IsNullOrEmpty()) return Result.Fail().WithGeneralError(HttpStatusCode.NotFound);
+
+      return Result.Succeed().WithValue(users[0]);
     }
     catch (Exception ex)
     {
       Console.WriteLine($"Error while searching for user by display-name / tag: {ex.Message}");
-      return resultBuilder
-        .Fail()
-        .WithGeneralError(500, "An unexpected error occurred while connecting to the database.")
-        .Build();
+      return Result.Fail().WithGeneralError(HttpStatusCode.InternalServerError, "An unexpected error occurred while connecting to the database.");
     }
   }
 
   public async Task<Result<UserEntity>> GetUserByEmailAddress(string emailAddress)
   {
-    ResultBuilder<UserEntity> resultBuilder = new();
-
     DynamoDBOperationConfig config = new()
     {
       IndexName = "EmailAddress-index"
@@ -98,73 +80,41 @@ public class UserRepository : IUserRepository
     try
     {
       List<UserEntity> users = await _context.QueryAsync<UserEntity>(emailAddress, config).GetRemainingAsync();
-      if (users.IsNullOrEmpty())
-      {
-        return resultBuilder
-          .Fail()
-          .WithGeneralError(404)
-          .Build();
-      }
-      return resultBuilder
-        .Succeed()
-        .WithValue(users[0])
-        .Build();
+
+      if (users.IsNullOrEmpty()) return Result.Fail().WithGeneralError(HttpStatusCode.NotFound);
+
+      return Result.Succeed().WithValue(users[0]);
     }
     catch (Exception ex)
     {
       Console.WriteLine($"Error while searching for user by email: {ex.Message}");
-      return resultBuilder
-        .Fail()
-        .WithGeneralError(500, "An unexpected error occurred while connecting to the database.")
-        .Build();
+      return Result.Fail().WithGeneralError(HttpStatusCode.InternalServerError, "An unexpected error occurred while connecting to the database.");
     }
   }
 
   public async Task<Result<UserEntity>> GetUserById(string id)
   {
-    ResultBuilder<UserEntity> resultBuilder = new();
-
     UserEntity? user = await _context.LoadAsync<UserEntity>(id);
 
-    if (user is null)
-    {
-      return resultBuilder
-        .Fail()
-        .WithGeneralError(404)
-        .Build();
-    }
+    if (user is null) return Result.Fail().WithGeneralError(HttpStatusCode.NotFound);
 
-    return resultBuilder
-      .Succeed()
-      .WithValue(user)
-      .Build();
+    return Result.Succeed().WithValue(user);
   }
 
   public async Task<Result> UpdateUser(UserEntity user)
   {
-    ResultBuilder resultBuilder = new();
     try
     {
       bool isIdUnique = await IsIdUnique(user.Id);
-      if (isIdUnique == true)
-      {
-        return resultBuilder
-          .Fail()
-          .WithGeneralError(404)
-          .Build();
-      }
+      if (isIdUnique == true) return Result.Fail().WithGeneralError(HttpStatusCode.NotFound);
+
       await _context.SaveAsync(user);
-      return resultBuilder
-        .Succeed()
-        .Build();
+      return Result.Succeed();
     }
     catch (Exception ex)
     {
       Console.WriteLine($"Error while updating user: {ex.Message}");
-      return resultBuilder
-        .Fail()
-        .WithGeneralError(500, "An unexpected error occurred while connecting to the database.")
-        .Build();
+      return Result.Fail().WithGeneralError(HttpStatusCode.InternalServerError, "An unexpected error occurred while connecting to the database.");
     }
   }
 

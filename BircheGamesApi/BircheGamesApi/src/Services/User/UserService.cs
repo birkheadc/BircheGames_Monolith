@@ -1,111 +1,72 @@
+using System.Net;
+using BircheGamesApi.Config;
 using BircheGamesApi.Models;
 using BircheGamesApi.Repositories;
 using BircheGamesApi.Requests;
+using BircheGamesApi.Results;
 using BircheGamesApi.Validation;
+using FluentValidation;
+using FluentValidation.Results;
 
 namespace BircheGamesApi.Services;
 
 public class UserService : IUserService
 {
-  private readonly IUserValidatorFactory _userValidatorFactory;
   private readonly IUserRepository _userRepository;
-
-  public UserService(IUserValidatorFactory userValidatorFactory, IUserRepository userRepository)
+  private readonly IMasterValidator _validator;
+  public UserService(IUserRepository userRepository, IMasterValidator validator)
   {
-    _userValidatorFactory = userValidatorFactory;
     _userRepository = userRepository;
+    _validator = validator;
   }
 
   public async Task<Result> PatchUserDisplayNameAndTag(string id, ChangeDisplayNameAndTagRequest request)
   {
-    Result validationResult = ValidateChangeDisplayNameAndTagRequest(request);
-    if (validationResult.WasSuccess == false)
-    {
-      return validationResult;
-    }
+    // Todo Inject validator
+    ValidationResult validationResult = _validator.Validate(request);
+    if (validationResult.IsValid == false) return Result.Fail();
 
-    UserEntity? user = (await _userRepository.GetUserById(id)).Value;
-    if (user is null)
-    {
-      return new ResultBuilder()
-        .Fail()
-        .WithGeneralError(404)
-        .Build();
-    }
+    Result<UserEntity> result = await _userRepository.GetUserById(id);
+    if (result.WasSuccess == false || result.Value is null) return result;
 
-    if (user.IsDisplayNameChosen)
-    {
-      return new ResultBuilder()
-        .Fail()
-        .WithGeneralError(422, "User has already chosen their display name and tag.")
-        .Build();
-    }
+    UserEntity user = result.Value;
+
+    if (user.IsDisplayNameChosen) return Result.Fail().WithGeneralError(HttpStatusCode.UnprocessableEntity, "User has already chosen their display name and tag.");
 
     bool isDisplayNameAndTagUnique = await IsDisplayNameAndTagUnique(request.DisplayName, request.Tag);
-    if (isDisplayNameAndTagUnique == false)
-    {
-      return new ResultBuilder()
-        .Fail()
-        .WithGeneralError(409)
-        .Build();
-    }
+    if (isDisplayNameAndTagUnique == false) return Result.Fail().WithGeneralError(HttpStatusCode.Conflict);
 
     user.DisplayName = request.DisplayName;
     user.Tag = request.Tag;
     user.IsDisplayNameChosen = true;
 
-    Result result = await _userRepository.UpdateUser(user);
-    return result;
-  }
-
-  private Result ValidateChangeDisplayNameAndTagRequest(ChangeDisplayNameAndTagRequest request)
-  {
-    IUserValidator userValidator = _userValidatorFactory.Create();
-    Result validationResult = userValidator
-      .WithDisplayName(request.DisplayName)
-      .WithTag(request.Tag)
-      .Validate();
-    return validationResult;
+    return await _userRepository.UpdateUser(user);
   }
 
   private async Task<bool> IsDisplayNameAndTagUnique(string displayName, string tag)
   {
-    UserEntity? user = (await _userRepository.GetUserByDisplayNameAndTag(displayName, tag)).Value;
-    return user is null;
+    Result<UserEntity> result = await _userRepository.GetUserByDisplayNameAndTag(displayName, tag);
+    return !result.WasSuccess;
   }
 
   public async Task<Result> RegisterUser(RegisterUserRequest request)
   {
-    IUserValidator userValidator = _userValidatorFactory.Create();
-    Result validationResult = userValidator
-      .WithEmailAddress(request.EmailAddress)
-      .WithPassword(request.Password)
-      .Validate();
-
-    if (validationResult.WasSuccess == false)
-    {
-      return validationResult;
-    }
+    ValidationResult validationResult = _validator.Validate(request);
+    if (validationResult.IsValid == false) return Result.Fail();
 
     bool isEmailAddressUnique = await IsEmailAddressUnique(request.EmailAddress);
-    if (isEmailAddressUnique == false)
-    {
-      return new ResultBuilder()
-        .Fail()
-        .WithGeneralError(409)
-        .Build();
-    }
+    if (isEmailAddressUnique == false) return Result.Fail().WithGeneralError(HttpStatusCode.Conflict);
 
-    UserEntity user = new(request);
+    UserEntity user = UserEntity.FromRegisterUserRequest(request);
+
     Result result = await _userRepository.CreateUser(user);
-    
     return result;
   }
 
   private async Task<bool> IsEmailAddressUnique(string emailAddress)
   {
     Result result = await _userRepository.GetUserByEmailAddress(emailAddress);
-    return result.WasSuccess == false;
+    return !result.WasSuccess;
   }
 
   public async Task<Result<UserEntity>> GetUser(string id)
@@ -113,21 +74,16 @@ public class UserService : IUserService
     return await _userRepository.GetUserById(id);
   }
 
-  public Task<Result<UserEntity>> GetUserByEmailAddress(string emailAddress)
+  public async Task<Result<UserEntity>> GetUserByEmailAddress(string emailAddress)
   {
-    return _userRepository.GetUserByEmailAddress(emailAddress);
+    return await _userRepository.GetUserByEmailAddress(emailAddress);
   }
 
   public async Task<Result> ValidateUserEmail(string id)
   {
     Result<UserEntity> result = await _userRepository.GetUserById(id);
-    if (result.WasSuccess == false || result.Value is null)
-    {
-      return new ResultBuilder()
-        .Fail()
-        .WithGeneralError(404)
-        .Build();
-    }
+    if (result.WasSuccess == false || result.Value is null) return Result.Fail().WithGeneralError(HttpStatusCode.NotFound);
+    
     UserEntity user = result.Value;
     user.IsEmailVerified = true;
     

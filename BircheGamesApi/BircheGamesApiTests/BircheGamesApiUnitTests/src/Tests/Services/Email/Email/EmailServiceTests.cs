@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Amazon.SimpleEmail.Model;
 using BircheGamesApi;
+using BircheGamesApi.Results;
 using BircheGamesApi.Services;
 using BircheGamesApiUnitTests.Mocks;
 using BircheGamesApiUnitTests.Mocks.ThirdParty;

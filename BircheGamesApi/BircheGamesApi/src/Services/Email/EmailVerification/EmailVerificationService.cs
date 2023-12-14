@@ -1,7 +1,9 @@
+using System.Net;
 using Amazon.SimpleEmail.Model;
 using BircheGamesApi.Config;
 using BircheGamesApi.Models;
 using BircheGamesApi.Requests;
+using BircheGamesApi.Results;
 
 namespace BircheGamesApi.Services;
 
@@ -31,13 +33,7 @@ public class EmailVerificationService : IEmailVerificationService
   public async Task<Result> GenerateAndSendVerificationEmail(GenerateVerificationEmailRequest request)
   {
     Result<UserEntity> getUserResult = await _userService.GetUserByEmailAddress(request.EmailAddress);
-    if (getUserResult.WasSuccess == false || getUserResult.Value is null)
-    {
-      return new ResultBuilder()
-        .Fail()
-        .WithGeneralError(404, "User with that email address not found.")
-        .Build();
-    }
+    if (getUserResult.WasSuccess == false || getUserResult.Value is null) return Result.Fail().WithGeneralError(HttpStatusCode.NotFound, "User with that email address not found.");
 
     SecurityTokenWrapper securityTokenWrapper = _securityTokenGenerator.GenerateTokenForUser(getUserResult.Value);
 
@@ -83,13 +79,7 @@ public class EmailVerificationService : IEmailVerificationService
   public async Task<Result> VerifyEmail(VerifyEmailRequest request)
   {
     string? userId = _securityTokenValidator.GetTokenUserId(request.VerificationCode);
-    if (userId is null)
-    {
-      return new ResultBuilder()
-        .Fail()
-        .WithGeneralError(401)
-        .Build();
-    }
+    if (userId is null) return Result.Fail().WithGeneralError(HttpStatusCode.Unauthorized);
 
     Result result = await _userService.ValidateUserEmail(userId);
     return result;

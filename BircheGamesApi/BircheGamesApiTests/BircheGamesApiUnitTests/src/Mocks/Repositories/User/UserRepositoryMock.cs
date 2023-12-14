@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using BircheGamesApi;
 using BircheGamesApi.Models;
 using BircheGamesApi.Repositories;
+using BircheGamesApi.Results;
 using BircheGamesApiUnitTests.Mocks.Exceptions;
 using Newtonsoft.Json;
 
@@ -14,7 +13,7 @@ public class UserRepositoryMock : BasicMock, IUserRepository
 
   public Task<Result> CreateUser(UserEntity user)
   {
-    MethodCalls.Add(new(){ MethodName = "CreateUser", Arguments = new[]{JsonConvert.SerializeObject(user)}});
+    AddMethodCall("CreateUser", user);
     
     MethodResponse response = GetMethodResponse("CreateUser");
     switch (response)
@@ -22,17 +21,9 @@ public class UserRepositoryMock : BasicMock, IUserRepository
       case MethodResponse.THROW:
         throw new IntentionalException();
       case MethodResponse.FAILURE:
-        return Task.FromResult(
-          new ResultBuilder()
-            .Fail()
-            .Build()
-        );
+        return Task.FromResult(Result.Fail());
       case MethodResponse.SUCCESS:
-        return Task.FromResult(
-          new ResultBuilder()
-            .Succeed()
-            .Build()
-        );
+        return Task.FromResult(Result.Succeed());
       default:
         throw new NotImplementedException();
     }
@@ -40,7 +31,7 @@ public class UserRepositoryMock : BasicMock, IUserRepository
 
   public Task<Result> DeleteUser(string id)
   {
-    MethodCalls.Add(new(){ MethodName = "DeleteUser", Arguments = new[]{id}});
+    AddMethodCall("DeleteUser", id);
 
     MethodResponse response = GetMethodResponse("DeleteUser");
     switch (response)
@@ -48,17 +39,9 @@ public class UserRepositoryMock : BasicMock, IUserRepository
       case MethodResponse.THROW:
         throw new IntentionalException();
       case MethodResponse.FAILURE:
-        return Task.FromResult(
-          new ResultBuilder()
-            .Fail()
-            .Build()
-        );
+        return Task.FromResult(Result.Fail());
       case MethodResponse.SUCCESS:
-        return Task.FromResult(
-          new ResultBuilder()
-            .Succeed()
-            .Build()
-        );
+        return Task.FromResult(Result.Succeed());
       default:
         throw new NotImplementedException();
     }
@@ -66,7 +49,7 @@ public class UserRepositoryMock : BasicMock, IUserRepository
 
   public Task<Result<UserEntity>> GetUserByDisplayNameAndTag(string displayName, string tag)
   {
-    MethodCalls.Add(new(){ MethodName = "GetUserByDisplayNameAndTag", Arguments = new[]{ displayName, tag }});
+    AddMethodCall("GetUserByDisplayNameAndTag", displayName, tag);
 
     MethodResponse response = GetMethodResponse("GetUserByDisplayNameAndTag");
     switch (response)
@@ -74,18 +57,9 @@ public class UserRepositoryMock : BasicMock, IUserRepository
       case MethodResponse.THROW:
         throw new IntentionalException();
       case MethodResponse.FAILURE:
-        return Task.FromResult(
-          new ResultBuilder<UserEntity>()
-            .Fail()
-            .Build()
-        );
+        return Task.FromResult(Result<UserEntity>.Fail());
       case MethodResponse.SUCCESS:
-        return Task.FromResult(
-          new ResultBuilder<UserEntity>()
-            .Succeed()
-            .WithValue(new() { DisplayName = displayName, Tag = tag })
-            .Build()
-        );
+        return Task.FromResult(Result<UserEntity>.Succeed().WithValue(new() { DisplayName = displayName, Tag = tag }));
       default:
         throw new NotImplementedException();
     }
@@ -93,7 +67,7 @@ public class UserRepositoryMock : BasicMock, IUserRepository
 
   public Task<Result<UserEntity>> GetUserById(string id)
   {
-    MethodCalls.Add(new(){ MethodName = "GetUserById", Arguments = new[]{id}});
+    AddMethodCall("GetUserById", id);
 
     MethodResponse response = GetMethodResponse("GetUserById");
     switch (response)
@@ -101,18 +75,9 @@ public class UserRepositoryMock : BasicMock, IUserRepository
       case MethodResponse.THROW:
         throw new IntentionalException();
       case MethodResponse.FAILURE:
-        return Task.FromResult(
-          new ResultBuilder<UserEntity>()
-            .Fail()
-            .Build()
-        );
+        return Task.FromResult(Result<UserEntity>.Fail());
       case MethodResponse.SUCCESS:
-        return Task.FromResult(
-          new ResultBuilder<UserEntity>()
-            .Succeed()
-            .WithValue(new() { Id = id })
-            .Build()
-        );
+        return Task.FromResult(Result<UserEntity>.Succeed().WithValue(new() { Id = id }));
       default:
         throw new NotImplementedException();
     }
@@ -120,7 +85,7 @@ public class UserRepositoryMock : BasicMock, IUserRepository
 
   public Task<Result<UserEntity>> GetUserByEmailAddress(string emailAddress)
   {
-    MethodCalls.Add(new(){ MethodName = "GetUserByEmailAddress", Arguments = new[]{emailAddress}});
+    AddMethodCall("GetUserByEmailAddress", emailAddress);
 
     MethodResponse response = GetMethodResponse("GetUserByEmailAddress");
     switch (response)
@@ -128,18 +93,9 @@ public class UserRepositoryMock : BasicMock, IUserRepository
       case MethodResponse.THROW:
         throw new IntentionalException();
       case MethodResponse.FAILURE:
-        return Task.FromResult(
-          new ResultBuilder<UserEntity>()
-            .Fail()
-            .Build()
-        );
+        return Task.FromResult(Result<UserEntity>.Fail());
       case MethodResponse.SUCCESS:
-        return Task.FromResult(
-          new ResultBuilder<UserEntity>()
-            .Succeed()
-            .WithValue(new() { EmailAddress = emailAddress })
-            .Build()
-        );
+        return Task.FromResult(Result<UserEntity>.Succeed().WithValue(new() { EmailAddress = emailAddress }));
       default:
         throw new NotImplementedException();
     }
@@ -147,7 +103,7 @@ public class UserRepositoryMock : BasicMock, IUserRepository
 
   public Task<Result> UpdateUser(UserEntity user)
   {
-    MethodCalls.Add(new(){ MethodName = "UpdateUser", Arguments = new[]{JsonConvert.SerializeObject(user)}});
+    AddMethodCall("UpdateUser", user);
 
     MethodResponse response = GetMethodResponse("UpdateUser");
     switch (response)
@@ -155,17 +111,9 @@ public class UserRepositoryMock : BasicMock, IUserRepository
       case MethodResponse.THROW:
         throw new IntentionalException();
       case MethodResponse.FAILURE:
-        return Task.FromResult(
-          new ResultBuilder()
-            .Fail()
-            .Build()
-        );
+        return Task.FromResult(Result.Fail());
       case MethodResponse.SUCCESS:
-        return Task.FromResult(
-          new ResultBuilder()
-            .Succeed()
-            .Build()
-        );
+        return Task.FromResult(Result.Succeed());
       default:
         throw new NotImplementedException();
     }

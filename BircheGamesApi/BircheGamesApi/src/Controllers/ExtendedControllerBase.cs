@@ -1,5 +1,7 @@
+using System.Net;
 using System.Security.Claims;
 using BircheGamesApi.Models;
+using BircheGamesApi.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
@@ -19,28 +21,9 @@ public class ExtendedControllerBase : ControllerBase
 
   internal ActionResult ResultToActionResult(Result result)
   {
-    if (result.WasSuccess)
-    {
-      return Ok();
-    }
-    
-    if (result.Errors.IsNullOrEmpty())
-    {
-      return BadRequest();
-    }
+    if (result.WasSuccess) return Ok();
 
-    int statusCode = GetFirstNonNullStatusCodeOrZeroFromResultErrors(result.Errors);
-    
-    if (statusCode == 0)
-    {
-      return BadRequest(result.Errors);
-    }
-    
-    return StatusCode(statusCode, result.Errors);
-  }
-
-  private static int GetFirstNonNullStatusCodeOrZeroFromResultErrors(IEnumerable<ResultError> errors)
-  {
-    return errors.Where(e => e.StatusCode is not null).FirstOrDefault()?.StatusCode ?? 0;
+    HttpStatusCode statusCode = result.Errors.Where(e => e.StatusCode is not null).FirstOrDefault()?.StatusCode ?? HttpStatusCode.BadRequest;
+    return StatusCode((int)statusCode, result.Errors);
   }
 }

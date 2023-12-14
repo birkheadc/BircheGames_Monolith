@@ -1,6 +1,7 @@
 using BircheGamesApi.Authorization;
 using BircheGamesApi.Models;
 using BircheGamesApi.Requests;
+using BircheGamesApi.Results;
 using BircheGamesApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,12 +28,9 @@ public class UserMeController : ExtendedControllerBase
     if (id is null) return Error();
 
     Result<UserEntity> result = await _userService.GetUser(id);
-    if (result.WasSuccess == false)
-    {
-      return NotFound();
-    }
+    if (result.WasSuccess == false) return NotFound();
 
-    return Ok(new UserResponseDto(result.Value));
+    return Ok(UserResponseDto.FromEntity(result.Value));
   }
 
   [HttpPatch]

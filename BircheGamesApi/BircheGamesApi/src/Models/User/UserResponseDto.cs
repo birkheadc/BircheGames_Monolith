@@ -14,18 +14,20 @@ public record UserResponseDto
   {
 
   }
-  public UserResponseDto(UserEntity? entity)
+
+  public static UserResponseDto FromEntity(UserEntity? entity)
   {
-    if (entity is not null)
+    if (entity is null) return new UserResponseDto();
+    return new UserResponseDto()
     {
-      Id = entity.Id;
-      EmailAddress = entity.EmailAddress;
-      DisplayName = entity.DisplayName;
-      Tag = entity.Tag;
-      CreationDateTime = entity.CreationDateTime;
-      Role = entity.Role;
-      IsEmailVerified = entity.IsEmailVerified;
-      IsDisplayNameChosen = entity.IsDisplayNameChosen;
-    }
+      Id = entity.Id,
+      EmailAddress = entity.EmailAddress,
+      DisplayName = entity.DisplayName,
+      Tag = entity.Tag,
+      CreationDateTime = entity.CreationDateTime,
+      Role = entity.Role,
+      IsEmailVerified = entity.IsEmailVerified,
+      IsDisplayNameChosen = entity.IsDisplayNameChosen
+    };
   }
 }
